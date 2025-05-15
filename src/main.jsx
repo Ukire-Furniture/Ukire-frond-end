@@ -6,6 +6,7 @@ import './index.css'
 import LoginPage from './login/LoginPage.jsx'
 import RegisterPage from './register/RegisterPage.jsx';
 import ProdukPage from './produk/ProdukPage.jsx';
+import ProdukDetailPage from './produk/[id]/detailpage.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -14,6 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/produk" element={<ProdukPage />} />
+        <Route path="/produk/:id" element={<ProdukDetailPage />} />
         <Route path="*" element={<App />} />
       </Routes>
     </BrowserRouter>
