@@ -166,7 +166,7 @@ export default function FAQPage() {
 
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-light mb-8">PERTANYAAN YANG SERING DIAJUKAN</h1>
+          <h1 className="text-3xl font-light mb-8 text-center">PERTANYAAN YANG SERING DIAJUKAN</h1>
 
           <div className="max-w-3xl mx-auto">
             <div className="mb-8">
