@@ -1,6 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Lakukan proses login di sini
+    // Setelah login sukses:
+    navigate("/profile");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
@@ -35,7 +44,7 @@ export default function LoginPage() {
               </Link>
             </div>
             <h1 className="text-2xl font-medium mb-6 text-center">LOGIN</h1>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm mb-1">Email*</label>
                 <input type="email" id="email" className="w-full border border-gray-300 px-4 py-2 focus:outline-none" required />

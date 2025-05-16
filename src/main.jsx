@@ -13,6 +13,9 @@ import CartPage from './cart/CartPage.jsx';
 import AboutPage from './about/AboutPage.jsx';
 import ContactPage from './contact/ContactPage.jsx';
 import FAQPage from './faq/FAQPage.jsx';
+import OrdersPage from './profile/orders/OrdersPage.jsx';
+import ProfilePage from './profile/profilePage.jsx';
+import WishlistPage from './profile/wishlist/WishlistPage.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -28,6 +31,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/faq" element={<FAQPage />} />
+        <Route path="/profile/orders" element={<OrdersPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/wishlist" element={<WishlistPage />} />
         <Route path="*" element={<App />} />
       </Routes>
     </BrowserRouter>
