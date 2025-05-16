@@ -1,31 +1,32 @@
 # 🪑 UKIRE - Furniture E-Commerce
 
-UKIRE adalah aplikasi e-commerce furniture berbasis React + Vite yang modern, responsif, dan mudah dikembangkan.  
-Proyek ini dibuat untuk memudahkan pengguna mencari, memesan, dan membeli produk furniture ukir berkualitas.
+UKIRE adalah aplikasi e-commerce furniture ukir berbasis **React** dan **Vite** yang modern, responsif, dan mudah dikembangkan.  
+Proyek ini dibuat untuk memudahkan pengguna mencari, memesan, dan membeli produk furniture ukir berkualitas tinggi dari pengrajin lokal.
 
 ---
 
 ## 🚀 Fitur Utama
 
-- **Landing Page**: Tampil elegan dengan kategori produk pilihan.
-- **Autentikasi**: Halaman Login & Register yang user-friendly.
-- **Daftar Produk**: Filter, pencarian, dan kategori produk.
-- **Detail Produk**: Lihat detail dan tambah ke keranjang.
-- **Keranjang Belanja**: Kelola pesanan dengan mudah.
-- **404 Not Found**: Desain error page yang informatif.
-- **Newsletter**: Berlangganan info promo terbaru.
-- **Responsive**: Tampilan optimal di desktop & mobile.
-- **Routing**: Navigasi cepat dengan React Router.
+- ✨ **Landing Page Elegan**: Tampilkan kategori produk pilihan dan highlight keunggulan UKIRE.
+- 🔐 **Autentikasi**: Halaman Login & Register yang user-friendly.
+- 🛒 **Keranjang Belanja**: Kelola pesanan, update jumlah, dan checkout dengan mudah.
+- 🏷️ **Daftar & Detail Produk**: Filter, pencarian, dan kategori produk.
+- 📦 **Pemesanan & Pembayaran**: Alur checkout lengkap, form alamat, dan pilihan metode pembayaran.
+- ❓ **FAQ & Kontak**: Informasi lengkap seputar produk, pengiriman, dan layanan pelanggan.
+- 📱 **Responsive Design**: Tampilan optimal di desktop & mobile.
+- ⚡ **Routing Cepat**: Navigasi mulus dengan React Router.
+- 📰 **Newsletter**: Berlangganan info promo terbaru.
+- 🚫 **404 Not Found**: Halaman error yang informatif.
 
 ---
 
 ## 🛠️ Teknologi
 
-- [React](https://react.dev/)
-- [Vite](https://vitejs.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [React Router DOM](https://reactrouter.com/)
-- [Lucide React Icons](https://lucide.dev/)
+- [React](https://react.dev/)  
+- [Vite](https://vitejs.dev/)  
+- [Tailwind CSS](https://tailwindcss.com/)  
+- [React Router DOM](https://reactrouter.com/)  
+- [Lucide React Icons](https://lucide.dev/)  
 
 ---
 
@@ -58,17 +59,24 @@ Proyek ini dibuat untuk memudahkan pengguna mencari, memesan, dan membeli produk
 
 ```
 src/
+  ├─ about/         # Halaman tentang UKIRE
+  ├─ cart/          # Halaman keranjang belanja
+  ├─ contact/       # Halaman kontak
+  ├─ faq/           # Halaman FAQ
   ├─ landingpage/   # Komponen landing page
   ├─ login/         # Halaman login
-  ├─ register/      # Halaman register
+  ├─ pembayaran/    # Halaman pembayaran
+  ├─ pemesanan/     # Halaman pemesanan
   ├─ produk/        # Daftar & detail produk
-  ├─ App.jsx
-  └─ main.jsx
+  ├─ profile/       # Halaman profil pengguna
+  ├─ register/      # Halaman registrasi
+  ├─ App.jsx        # Root komponen aplikasi
+  └─ main.jsx       # Entry point aplikasi
 ```
 
 ---
 
-## 🙌 Kontribusi
+## 🤝 Kontribusi
 
 Pull request dan issue sangat terbuka untuk pengembangan lebih lanjut!  
 Silakan fork, buat branch, dan ajukan PR.
