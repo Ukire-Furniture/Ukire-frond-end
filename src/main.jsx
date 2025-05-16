@@ -7,6 +7,7 @@ import LoginPage from './login/LoginPage.jsx'
 import RegisterPage from './register/RegisterPage.jsx';
 import ProdukPage from './produk/ProdukPage.jsx';
 import ProdukDetailPage from './produk/[id]/detailpage.jsx';
+import PembayaranPage from './pembayaran/PembayaranPage.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/produk" element={<ProdukPage />} />
         <Route path="/produk/:id" element={<ProdukDetailPage />} />
+        <Route path="/pembayaran" element={<PembayaranPage />} />
         <Route path="*" element={<App />} />
       </Routes>
     </BrowserRouter>
