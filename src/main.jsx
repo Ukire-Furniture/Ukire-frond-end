@@ -8,6 +8,9 @@ import RegisterPage from './register/RegisterPage.jsx';
 import ProdukPage from './produk/ProdukPage.jsx';
 import ProdukDetailPage from './produk/[id]/detailpage.jsx';
 import PembayaranPage from './pembayaran/PembayaranPage.jsx';
+import PemesananPage from './pemesanan/PemesananPage.jsx';
+import CartPage from './cart/CartPage.jsx';
+import AboutPage from './about/AboutPage.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -18,6 +21,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/produk" element={<ProdukPage />} />
         <Route path="/produk/:id" element={<ProdukDetailPage />} />
         <Route path="/pembayaran" element={<PembayaranPage />} />
+        <Route path="/pemesanan" element={<PemesananPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<App />} />
       </Routes>
     </BrowserRouter>
