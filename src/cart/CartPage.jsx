@@ -8,14 +8,14 @@ export default function CartPage() {
       name: "Lemari Ukir Klasik",
       price: 12500000,
       quantity: 1,
-      image: "/images/product-2.png",
+      image: "/images/kayu/kursi.png",
     },
     {
       id: 3,
       name: "Set Kursi Tamu Ukir",
       price: 15900000,
       quantity: 1,
-      image: "/images/product-5.png",
+      image: "/images/kayu/kursi.png",
     },
   ];
 

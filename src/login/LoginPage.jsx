@@ -5,8 +5,6 @@ export default function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Lakukan proses login di sini
-    // Setelah login sukses:
     navigate("/profile");
   };
 
@@ -37,13 +35,7 @@ export default function LoginPage() {
       <main className="flex-1 flex items-center justify-center py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto bg-white p-8 shadow-sm">
-            <div className="text-center mb-8">
-              <Link to="/" className="inline-flex items-center">
-                <div className="w-3 h-3 bg-black rotate-45 mr-1"></div>
-                <span className="text-2xl font-bold">UKIRE</span>
-              </Link>
-            </div>
-            <h1 className="text-2xl font-medium mb-6 text-center">LOGIN</h1>
+            <h1 className="text-2xl font-bold mb-8 text-center">LOGIN</h1>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm mb-1">Email*</label>

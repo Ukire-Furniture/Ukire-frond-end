@@ -17,6 +17,7 @@ import OrdersPage from './profile/orders/OrdersPage.jsx';
 import ProfilePage from './profile/profilePage.jsx';
 import WishlistPage from './profile/wishlist/WishlistPage.jsx';
 
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -37,5 +38,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="*" element={<App />} />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>,
+  </React.StrictMode>
 )

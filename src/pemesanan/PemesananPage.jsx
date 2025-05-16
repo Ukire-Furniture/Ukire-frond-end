@@ -8,14 +8,14 @@ export default function PemesananPage() {
       name: "Lemari Ukir Klasik",
       price: "Rp 12.500.000",
       quantity: 1,
-      image: "/images/product-2.png",
+      image: "/images/kayu/kursi.png",
     },
     {
       id: 3,
       name: "Set Kursi Tamu Ukir",
       price: "Rp 15.900.000",
       quantity: 1,
-      image: "/images/product-5.png",
+      image: "/images/kayu/kursi.png",
     },
   ];
 

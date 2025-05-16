@@ -10,7 +10,7 @@ const BannerSection = () => {
                 <a href="#" className="text-sm text-black underline">VIEW NOW</a>
             </div>
             <div className="flex justify-center flex-1">
-                <img src="c:/Users/Lenovo/Downloads/Kursi.png" alt="Chair" className="object-contain h-[300px] md:h-[400px]" />
+                <img src="public/images/kayu/Kursi.png" alt="Chair" className="object-contain h-[300px] md:h-[400px]" />
             </div>
         </section>
     );

@@ -28,14 +28,9 @@ export default function RegisterPage() {
       <main className="flex-1 py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto bg-white p-8 shadow-sm">
-            <div className="text-center mb-8">
-              <Link to="/" className="inline-flex items-center">
-                <div className="w-3 h-3 bg-black rotate-45 mr-1"></div>
-                <span className="text-2xl font-bold">UKIRE</span>
-              </Link>
-            </div>
+          
 
-            <h1 className="text-2xl font-medium mb-6 text-center">DAFTAR AKUN</h1>
+            <h1 className="text-xl font-bold mb-6 text-center">DAFTAR AKUN</h1>
 
             <form className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

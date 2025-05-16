@@ -4,23 +4,28 @@ export default function AboutPage() {
   const teamMembers = [
     {
       name: "Nibras Ahmad Badruzzaman",
-      position: "Founder & CEO",
-      image: "/placeholder.svg?height=300&width=300",
+      position: "Project Manager",
+      image: "public/images/nibras.jpg",
     },
     {
-      name: "Siti Rahayu",
-      position: "Creative Director",
-      image: "/placeholder.svg?height=300&width=300",
+      name: "Deri Ibrahim",
+      position: "UI/UX Designer",
+      image: "public/images/deri.jpeg",
     },
     {
-      name: "Budi Santoso",
-      position: "Head of Production",
-      image: "/placeholder.svg?height=300&width=300",
+      name: "Firdo Maulana Firdaus",
+      position: "Front-end Developer",
+      image: "public/images/virdo.jpeg",
     },
     {
-      name: "Dewi Lestari",
-      position: "Marketing Manager",
-      image: "/placeholder.svg?height=300&width=300",
+      name: "Awalludin",
+      position: "Database Administrator",
+      image: "public/images/awal.jpeg",
+    },
+    {
+      name: "Afrendra Pratama",
+      position: "Back-end Developer",
+      image: "public/images/rendra.jpeg",
     },
   ];
 
@@ -64,7 +69,7 @@ export default function AboutPage() {
         {/* Hero Section */}
         <section className="bg-gray-100 py-20">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl font-light mb-6">TENTANG KAMI</h1>
+            <h1 className="text-4xl font-medium mb-6">TENTANG KAMI</h1>
             <p className="max-w-2xl mx-auto text-gray-600">
               UKIRE adalah perusahaan furniture premium yang mengkhususkan diri dalam seni ukir kayu tradisional
               Indonesia. Kami menggabungkan keahlian pengrajin lokal dengan desain modern untuk menciptakan karya seni
@@ -79,15 +84,15 @@ export default function AboutPage() {
             <div className="flex flex-col md:flex-row items-center gap-12">
               <div className="md:w-1/2">
                 <img
-                  src="/placeholder.svg?height=600&width=800"
+                  src="/public/images/ukir.jpg"
                   alt="Pengrajin UKIRE sedang mengukir"
-                  width={800}
-                  height={600}
+                  width={400}
+                  height={200}
                   className="w-full h-auto"
                 />
               </div>
               <div className="md:w-1/2">
-                <h2 className="text-3xl font-light mb-6">CERITA KAMI</h2>
+                <h2 className="text-3xl font-medium mb-6">CERITA KAMI</h2>
                 <p className="mb-4">
                   Didirikan pada tahun 2010, UKIRE berawal dari kecintaan terhadap seni ukir kayu tradisional Indonesia
                   yang mulai terlupakan. Kami melihat potensi besar dalam keahlian para pengrajin lokal dan memutuskan
@@ -111,7 +116,7 @@ export default function AboutPage() {
         {/* Our Values */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-light mb-12 text-center">NILAI-NILAI KAMI</h2>
+            <h2 className="text-3xl font-medium mb-12 text-center">NILAI-NILAI KAMI</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center p-6">
@@ -153,7 +158,7 @@ export default function AboutPage() {
         {/* Our Team */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-light mb-12 text-center">TIM KAMI</h2>
+            <h2 className="text-3xl font-medium mb-12 text-center">TIM KAMI</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {teamMembers.map((member, index) => (
@@ -207,7 +212,7 @@ export default function AboutPage() {
               </div>
               <div className="md:w-1/2">
                 <img
-                  src="/placeholder.svg?height=600&width=800"
+                  src="public/images/kursi.png"
                   alt="Showroom UKIRE"
                   width={800}
                   height={600}

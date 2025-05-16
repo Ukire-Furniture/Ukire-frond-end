@@ -15,7 +15,7 @@ export default function OrdersPage() {
           name: "Lemari Ukir Klasik",
           price: 12500000,
           quantity: 1,
-          image: "/images/product-2.png",
+          image: "ukire-app/public/images/kursi.png",
         },
         {
           id: 3,
