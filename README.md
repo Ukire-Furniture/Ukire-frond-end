@@ -82,7 +82,14 @@ Pull request dan issue sangat terbuka untuk pengembangan lebih lanjut!
 Silakan fork, buat branch, dan ajukan PR.
 
 ---
+## team ukire
+Nibras 
+Awal
+Deri 
+Rendra
+Virdo
 
+---
 ## © 2025 UKIRE
 
 Furniture ukir, kualitas terbaik untuk rumah Anda.
