@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
 import LoginPage from './login/LoginPage.jsx'
@@ -16,7 +16,17 @@ import FAQPage from './faq/FAQPage.jsx';
 import OrdersPage from './profile/orders/OrdersPage.jsx';
 import ProfilePage from './profile/profilePage.jsx';
 import WishlistPage from './profile/wishlist/WishlistPage.jsx';
+import HomePage from "./home/HomePage";
 
+function isLoggedIn() {
+  // Contoh: cek token di localStorage
+  return !!localStorage.getItem("userToken");
+}
+
+// Komponen ProtectedRoute
+function ProtectedRoute({ children }) {
+  return isLoggedIn() ? children : <App />; // App = landing page
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -24,10 +34,48 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/produk" element={<ProdukPage />} />
-        <Route path="/produk/:id" element={<ProdukDetailPage />} />
-        <Route path="/pembayaran" element={<PembayaranPage />} />
-        <Route path="/pemesanan" element={<PemesananPage />} />
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/produk"
+          element={
+            <ProtectedRoute>
+              <ProdukPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/produk/:id"
+          element={
+            <ProtectedRoute>
+              <ProdukDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pemesanan"
+          element={
+            <ProtectedRoute>
+              <PemesananPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pembayaran"
+          element={
+            <ProtectedRoute>
+              <PembayaranPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* Route lain tetap */}
         <Route path="/cart" element={<CartPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />

@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 
+// Tambahkan fungsi ini di atas komponen
+function isLoggedIn() {
+  return !!localStorage.getItem("userToken");
+}
+
 export default function PemesananPage() {
   const cartItems = [
     {
@@ -46,9 +51,15 @@ export default function PemesananPage() {
         </div>
 
         <div className="flex items-center space-x-4 text-sm">
-          <Link to="/login" className="text-gray-700">
-            Login
-          </Link>
+          {isLoggedIn() ? (
+            <Link to="/profile" className="font-medium">
+              Profile
+            </Link>
+          ) : (
+            <Link to="/login" className="text-gray-700">
+              Login
+            </Link>
+          )}
           <Link to="/cart" className="flex items-center text-gray-700">
             <span>Cart(2)</span>
           </Link>
@@ -188,21 +199,37 @@ export default function PemesananPage() {
                 <h2 className="text-xl font-medium mb-6">Metode Pengiriman</h2>
                 <div className="space-y-3">
                   <div className="flex items-center border border-gray-300 p-4">
-                    <input type="radio" id="shipping-1" name="shipping" className="mr-3" defaultChecked />
+                    <input
+                      type="radio"
+                      id="shipping-1"
+                      name="shipping"
+                      className="mr-3"
+                      defaultChecked
+                    />
                     <label htmlFor="shipping-1" className="flex-1">
                       <div className="font-medium">Reguler (3-5 hari kerja)</div>
                       <div className="text-sm text-gray-500">Rp 250.000</div>
                     </label>
                   </div>
                   <div className="flex items-center border border-gray-300 p-4">
-                    <input type="radio" id="shipping-2" name="shipping" className="mr-3" />
+                    <input
+                      type="radio"
+                      id="shipping-2"
+                      name="shipping"
+                      className="mr-3"
+                    />
                     <label htmlFor="shipping-2" className="flex-1">
                       <div className="font-medium">Express (1-2 hari kerja)</div>
                       <div className="text-sm text-gray-500">Rp 500.000</div>
                     </label>
                   </div>
                   <div className="flex items-center border border-gray-300 p-4">
-                    <input type="radio" id="shipping-3" name="shipping" className="mr-3" />
+                    <input
+                      type="radio"
+                      id="shipping-3"
+                      name="shipping"
+                      className="mr-3"
+                    />
                     <label htmlFor="shipping-3" className="flex-1">
                       <div className="font-medium">Ambil di Toko</div>
                       <div className="text-sm text-gray-500">Gratis</div>
@@ -239,7 +266,9 @@ export default function PemesananPage() {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-sm font-medium">{item.name}</h3>
-                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                        <p className="text-sm text-gray-500">
+                          Qty: {item.quantity}
+                        </p>
                         <p className="text-sm">{item.price}</p>
                       </div>
                     </div>

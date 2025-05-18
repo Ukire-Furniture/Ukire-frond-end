@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 import { Filter, Search, ChevronDown } from "lucide-react";
 
+function isLoggedIn() {
+  return !!localStorage.getItem("userToken");
+}
+
 export default function ProdukPage() {
   const categories = [
     { name: "Semua Produk", count: 120 },
@@ -88,9 +92,15 @@ export default function ProdukPage() {
         </div>
 
         <div className="flex items-center space-x-4 text-sm">
-          <Link to="/login" className="text-gray-700">
-            Login
-          </Link>
+          {isLoggedIn() ? (
+            <Link to="/profile" className="font-medium">
+              Profile
+            </Link>
+          ) : (
+            <Link to="/login" className="text-gray-700">
+              Login
+            </Link>
+          )}
           <Link to="/cart" className="flex items-center text-gray-700">
             <span>Cart(0)</span>
           </Link>
@@ -231,13 +241,21 @@ export default function ProdukPage() {
               {/* Pagination */}
               <div className="mt-12 flex justify-center">
                 <div className="flex space-x-1">
-                  <button className="w-10 h-10 flex items-center justify-center border border-gray-300">&lt;</button>
+                  <button className="w-10 h-10 flex items-center justify-center border border-gray-300">
+                    &lt;
+                  </button>
                   <button className="w-10 h-10 flex items-center justify-center border border-black bg-black text-white">
                     1
                   </button>
-                  <button className="w-10 h-10 flex items-center justify-center border border-gray-300">2</button>
-                  <button className="w-10 h-10 flex items-center justify-center border border-gray-300">3</button>
-                  <button className="w-10 h-10 flex items-center justify-center border border-gray-300">&gt;</button>
+                  <button className="w-10 h-10 flex items-center justify-center border border-gray-300">
+                    2
+                  </button>
+                  <button className="w-10 h-10 flex items-center justify-center border border-gray-300">
+                    3
+                  </button>
+                  <button className="w-10 h-10 flex items-center justify-center border border-gray-300">
+                    &gt;
+                  </button>
                 </div>
               </div>
             </div>

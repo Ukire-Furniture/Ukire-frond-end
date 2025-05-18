@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
 import { ChevronRight, CreditCard, Landmark, Wallet } from "lucide-react";
 
+// Tambahkan fungsi ini di atas komponen
+function isLoggedIn() {
+  return !!localStorage.getItem("userToken");
+}
+
 export default function PembayaranPage() {
   const cartItems = [
     {
@@ -46,9 +51,15 @@ export default function PembayaranPage() {
         </div>
 
         <div className="flex items-center space-x-4 text-sm">
-          <Link to="/login" className="text-gray-700">
-            Login
-          </Link>
+          {isLoggedIn() ? (
+            <Link to="/profile" className="font-medium">
+              Profile
+            </Link>
+          ) : (
+            <Link to="/login" className="text-gray-700">
+              Login
+            </Link>
+          )}
           <Link to="/cart" className="flex items-center text-gray-700">
             <span>Cart(2)</span>
           </Link>
@@ -84,7 +95,13 @@ export default function PembayaranPage() {
                 <div className="space-y-4">
                   <div className="border border-gray-300 p-4">
                     <div className="flex items-center mb-4">
-                      <input type="radio" id="payment-1" name="payment" className="mr-3" defaultChecked />
+                      <input
+                        type="radio"
+                        id="payment-1"
+                        name="payment"
+                        className="mr-3"
+                        defaultChecked
+                      />
                       <label htmlFor="payment-1" className="flex items-center">
                         <CreditCard className="h-5 w-5 mr-2" />
                         <span className="font-medium">Kartu Kredit / Debit</span>

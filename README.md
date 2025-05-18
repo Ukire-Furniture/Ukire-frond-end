@@ -7,8 +7,8 @@ Proyek ini dibuat untuk memudahkan pengguna mencari, memesan, dan membeli produk
 
 ## 🚀 Fitur Utama
 
-- ✨ **Landing Page Elegan**: Tampilkan kategori produk pilihan dan highlight keunggulan UKIRE.
-- 🔐 **Autentikasi**: Halaman Login & Register yang user-friendly.
+- ✨ **Landing Page Elegan**: Menampilkan kategori produk pilihan dan highlight keunggulan UKIRE.
+- 🔐 **Autentikasi**: Halaman Login & Register yang user-friendly. Hanya user yang sudah login yang dapat mengakses Home, Produk, Pemesanan, dan Pembayaran.
 - 🛒 **Keranjang Belanja**: Kelola pesanan, update jumlah, dan checkout dengan mudah.
 - 🏷️ **Daftar & Detail Produk**: Filter, pencarian, dan kategori produk.
 - 📦 **Pemesanan & Pembayaran**: Alur checkout lengkap, form alamat, dan pilihan metode pembayaran.
@@ -17,6 +17,7 @@ Proyek ini dibuat untuk memudahkan pengguna mencari, memesan, dan membeli produk
 - ⚡ **Routing Cepat**: Navigasi mulus dengan React Router.
 - 📰 **Newsletter**: Berlangganan info promo terbaru.
 - 🚫 **404 Not Found**: Halaman error yang informatif.
+- 👤 **Profile**: Setelah login, tombol Login berubah menjadi Profile dan mengarah ke halaman profil pengguna.
 
 ---
 
@@ -82,14 +83,17 @@ Pull request dan issue sangat terbuka untuk pengembangan lebih lanjut!
 Silakan fork, buat branch, dan ajukan PR.
 
 ---
-## team ukire
-Nibras 
-Awal
-Deri 
-Rendra
-Virdo
+
+## 👥 Tim UKIRE
+
+- Nibras 
+- Awal
+- Deri 
+- Rendra
+- Virdo
 
 ---
+
 ## © 2025 UKIRE
 
 Furniture ukir, kualitas terbaik untuk rumah Anda.

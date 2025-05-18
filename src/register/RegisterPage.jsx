@@ -1,5 +1,10 @@
 import { Link } from "react-router-dom";
 
+// Tambahkan fungsi ini di atas komponen
+function isLoggedIn() {
+  return !!localStorage.getItem("userToken");
+}
+
 export default function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -18,7 +23,11 @@ export default function RegisterPage() {
           </Link>
         </div>
         <div className="flex items-center space-x-4 text-sm">
-          <Link to="/login" className="text-gray-700">Login</Link>
+          {isLoggedIn() ? (
+            <Link to="/profile" className="font-medium">Profile</Link>
+          ) : (
+            <Link to="/login" className="text-gray-700">Login</Link>
+          )}
           <Link to="/cart" className="flex items-center text-gray-700">
             <span>Cart(0)</span>
           </Link>
