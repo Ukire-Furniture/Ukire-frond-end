@@ -1,6 +1,6 @@
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
-import { useEffect, useState, useCallback } from "react"; // Tambahkan useCallback
+import { useEffect, useState, useCallback } from "react";
 import { callApi, API_BASE_URL } from "../../utils/api";
 import Loading from "../../loading";
 
@@ -140,7 +140,7 @@ export default function WishlistPage() {
             <Link to="/login" className="text-gray-700">Login</Link>
           )}
           <Link to="/cart" className="flex items-center text-gray-700">
-            <span>Cart(0)</span> {/* Akan diupdate dengan jumlah cart nanti */}
+            <span>Cart(0)</span> {/* Jumlah cart akan diupdate oleh Navbar.jsx */}
           </Link>
         </div>
       </header>
@@ -192,8 +192,8 @@ export default function WishlistPage() {
                           </span>
                         </td>
                         <td className="py-4 px-4">
+                          {/* Belum ada fitur "Tambah ke Keranjang" dari wishlist, bisa ditambahkan nanti */}
                           <button
-                            // Belum ada fitur "Tambah ke Keranjang" dari wishlist
                             className={`px-4 py-2 text-sm rounded ${
                               getStockStatus(item.stock) === "Tersedia"
                                 ? "bg-black text-white hover:bg-gray-800"
@@ -237,7 +237,7 @@ export default function WishlistPage() {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Footer (tetap seperti sebelumnya) */}
       <footer className="mt-auto pt-16 pb-8 border-t">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
