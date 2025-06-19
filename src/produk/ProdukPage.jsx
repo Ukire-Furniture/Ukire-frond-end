@@ -1,12 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Filter, Search, ChevronDown } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
-import { callApi } from "../utils/api";
+import { callApi, API_BASE_URL } from "../utils/api";
 import Loading from "../loading";
-
-function isLoggedIn() {
-  return !!localStorage.getItem("accessToken");
-}
+import { isLoggedIn } from "../main"; 
+import Navbar from '../components/Navbar'; // Impor Navbar
+import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
 
 export default function ProdukPage() {
   const [categories, setCategories] = useState([]);
@@ -17,7 +16,7 @@ export default function ProdukPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const navigate = useNavigate(); // Pastikan useNavigate diimpor
+  const navigate = useNavigate();
 
   const location = useLocation();
 
@@ -32,10 +31,11 @@ export default function ProdukPage() {
       if (category) {
         endpoint += `&category=${encodeURIComponent(category)}`;
       }
-      
+
       const response = await callApi(endpoint, "GET");
       setProducts(response.data);
       setPagination(response.pagination);
+      setCurrentPage(response.pagination.current_page);
       setLoading(false);
 
       const params = new URLSearchParams();
@@ -104,7 +104,7 @@ export default function ProdukPage() {
     const token = localStorage.getItem("accessToken");
     if (!token) {
       alert("Anda harus login untuk menambahkan produk ke keranjang.");
-      navigate("/login"); // Redirect ke halaman login
+      navigate("/login");
       return;
     }
 
@@ -142,100 +142,63 @@ export default function ProdukPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <header className="container mx-auto py-6 px-4 flex items-center">
-        <nav className="flex items-center space-x-6 text-sm">
-          <Link to="/" className="text-gray-500">
-            Home
-          </Link>
-          <Link to="/produk" className="font-medium">
-            Produk
-          </Link>
-          <Link to="/pemesanan" className="text-gray-500">
-            Pemesanan
-          </Link>
-          <Link to="/pembayaran" className="text-gray-500">
-            Pembayaran
-          </Link>
-        </nav>
+      {/* Navbar di sini */}
+      <Navbar />
 
-        <div className="flex-1 flex justify-center">
-          <Link to="/" className="flex items-center">
-            <div className="w-3 h-3 bg-black rotate-45 mr-1"></div>
-            <span className="text-2xl font-bold">UKIRE</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center space-x-4 text-sm">
-          {isLoggedIn() ? (
-            <Link to="/profile" className="font-medium">
-              Profile
-            </Link>
-          ) : (
-            <Link to="/login" className="text-gray-700">
-              Login
-            </Link>
-          )}
-          <Link to="/cart" className="flex items-center text-gray-700">
-            <span>Cart(0)</span>
-          </Link>
-        </div>
-      </header>
-
-      <main className="flex-1">
+      <main className="flex-1 bg-ukire-gray">
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-3xl font-light mb-8">PRODUK KAMI</h1>
+          <h1 className="text-3xl font-light mb-8 text-ukire-black">PRODUK KAMI</h1>
 
           {/* Search and Filter */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 p-4 bg-white rounded-lg shadow-md">
             <form onSubmit={handleSearchSubmit} className="relative w-full md:w-64 mb-4 md:mb-0">
               <input
                 type="text"
                 placeholder="Cari produk..."
-                className="w-full border border-gray-300 px-4 py-2 pr-10 focus:outline-none rounded"
+                className="w-full border border-gray-300 px-4 py-2 pr-10 focus:outline-none rounded-lg focus:ring-1 focus:ring-amber-500"
                 value={searchQuery}
                 onChange={handleSearchChange}
               />
-              <button type="submit" className="absolute right-0 top-0 h-full w-10 flex items-center justify-center text-gray-400">
+              <button type="submit" className="absolute right-0 top-0 h-full w-10 flex items-center justify-center text-ukire-text">
                 <Search className="h-4 w-4" />
               </button>
             </form>
 
             <div className="flex space-x-4">
-              <button className="flex items-center border border-gray-300 px-4 py-2 text-sm rounded">
+              <button className="flex items-center border border-gray-300 px-4 py-2 text-sm rounded-lg bg-white hover:bg-ukire-gray transition-colors font-medium text-ukire-text">
                 <Filter className="h-4 w-4 mr-2" />
                 Filter
               </button>
-              <button className="flex items-center border border-gray-300 px-4 py-2 text-sm rounded">
+              <button className="flex items-center border border-gray-300 px-4 py-2 text-sm rounded-lg bg-white hover:bg-ukire-gray transition-colors font-medium text-ukire-text">
                 Urutkan
                 <ChevronDown className="h-4 w-4 ml-2" />
               </button>
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row">
+          <div className="flex flex-col md:flex-row gap-8">
             {/* Categories Sidebar */}
-            <div className="w-full md:w-64 md:pr-8 mb-8 md:mb-0">
-              <h2 className="text-lg font-medium mb-4">Kategori</h2>
+            <div className="w-full md:w-64 md:pr-0 mb-8 md:mb-0 bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-lg font-medium mb-4 text-ukire-black">Kategori</h2>
               <ul className="space-y-3">
                 {/* Tombol "Semua Produk" */}
                 <li>
                   <button
                     onClick={() => handleCategoryChange("")}
-                    className={`flex justify-between text-sm hover:text-black w-full text-left ${
-                      selectedCategory === "" ? "font-bold text-black" : "text-gray-500"
+                    className={`flex justify-between text-sm hover:text-ukire-black w-full text-left py-1 px-2 rounded-lg transition-colors ${
+                      selectedCategory === "" ? "font-bold text-ukire-black bg-ukire-gray" : "text-ukire-text"
                     }`}
                   >
                     <span>Semua Produk</span>
-                    <span className="text-gray-500">({pagination.total || 0})</span>
+                    <span className="text-ukire-text">({pagination.total || 0})</span>
                   </button>
                 </li>
                 {categories.map((category) => (
                   <li key={category.id}>
                     <button
                       onClick={() => handleCategoryChange(category.name)}
-                      className={`flex justify-between text-sm hover:text-black w-full text-left ${
-                        selectedCategory === category.name ? "font-bold text-black" : "text-gray-500"
+                      className={`flex justify-between text-sm hover:text-ukire-black w-full text-left py-1 px-2 rounded-lg transition-colors ${
+                        selectedCategory === category.name ? "font-bold text-ukire-black bg-ukire-gray" : "text-ukire-text"
                       }`}
                     >
                       <span>{category.name}</span>
@@ -245,29 +208,29 @@ export default function ProdukPage() {
               </ul>
 
               {/* Bagian Filter Harga dan Material (tetap statis) */}
-              <div className="mt-8 border-t pt-8">
-                <h2 className="text-lg font-medium mb-4">Harga</h2>
+              <div className="mt-8 border-t border-gray-200 pt-8">
+                <h2 className="text-lg font-medium mb-4 text-ukire-black">Harga</h2>
                 <div className="space-y-2">
                   <div className="flex items-center">
-                    <input type="checkbox" id="price-1" className="mr-2 rounded" />
-                    <label htmlFor="price-1" className="text-sm">
+                    <input type="checkbox" id="price-1" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" />
+                    <label htmlFor="price-1" className="text-sm text-ukire-text">
                       Dibawah Rp 5.000.000
                     </label>
                   </div>
                   <div className="flex items-center">
-                    <input type="checkbox" id="price-2" className="mr-2 rounded" />
+                    <input type="checkbox" id="price-2" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" />
                     <label htmlFor="price-2" className="text-sm">
                       Rp 5.000.000 - Rp 10.000.000
                     </label>
                   </div>
                   <div className="flex items-center">
-                    <input type="checkbox" id="price-3" className="mr-2 rounded" />
+                    <input type="checkbox" id="price-3" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" />
                     <label htmlFor="price-3" className="text-sm">
                       Rp 10.000.000 - Rp 15.000.000
                     </label>
                   </div>
                   <div className="flex items-center">
-                    <input type="checkbox" id="price-4" className="mr-2 rounded" />
+                    <input type="checkbox" id="price-4" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" />
                     <label htmlFor="price-4" className="text-sm">
                       Diatas Rp 15.000.000
                     </label>
@@ -275,29 +238,29 @@ export default function ProdukPage() {
                 </div>
               </div>
 
-              <div className="mt-8 border-t pt-8">
-                <h2 className="text-lg font-medium mb-4">Material</h2>
+              <div className="mt-8 border-t border-gray-200 pt-8">
+                <h2 className="text-lg font-medium mb-4 text-ukire-black">Material</h2>
                 <div className="space-y-2">
                   <div className="flex items-center">
-                    <input type="checkbox" id="material-1" className="mr-2 rounded" />
+                    <input type="checkbox" id="material-1" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" />
                     <label htmlFor="material-1" className="text-sm">
                       Kayu Jati
                     </label>
                   </div>
                   <div className="flex items-center">
-                    <input type="checkbox" id="material-2" className="mr-2 rounded" />
+                    <input type="checkbox" id="material-2" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" />
                     <label htmlFor="material-2" className="text-sm">
                       Kayu Mahoni
                     </label>
                   </div>
                   <div className="flex items-center">
-                    <input type="checkbox" id="material-3" className="mr-2 rounded" />
+                    <input type="checkbox" id="material-3" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" />
                     <label htmlFor="material-3" className="text-sm">
                       Kayu Mindi
                     </label>
                   </div>
                   <div className="flex items-center">
-                    <input type="checkbox" id="material-4" className="mr-2 rounded" />
+                    <input type="checkbox" id="material-4" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" />
                     <label htmlFor="material-4" className="text-sm">
                       Kayu Sonokeling
                     </label>
@@ -309,20 +272,21 @@ export default function ProdukPage() {
             {/* Products Grid */}
             <div className="flex-1">
               {products.length === 0 && !loading && (
-                <div className="text-center text-gray-600 py-12">Tidak ada produk ditemukan.</div>
+                <div className="text-center text-ukire-text py-12">Tidak ada produk ditemukan.</div>
               )}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {products.map((product) => (
-                  <div key={product.id} className="group">
-                    <Link to={`/produk/${product.id}`}>
-                      <div className="mb-4 aspect-square overflow-hidden bg-gray-100 rounded-lg">
-                        <img src={product.image_path ? `http://ukirebackend.test/storage/${product.image_path}` : "https://placehold.co/300x300/cccccc/333333?text=No+Image"} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div key={product.id} className="group bg-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl">
+                    <Link to={`/produk/${product.id}`} className="block p-4">
+                      <div className="mb-4 aspect-square overflow-hidden bg-ukire-gray rounded-lg">
+                        <img src={product.image_path ? `${API_BASE_URL.replace('/api', '')}/storage/${product.image_path}` : "https://placehold.co/300x300/cccccc/333333?text=No+Image"} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                       </div>
-                      <h3 className="text-base font-medium">{product.name}</h3>
-                      <p className="text-sm text-gray-700 mt-1">{product.category ? product.category.name : 'Tanpa Kategori'}</p>
-                      <p className="text-sm font-semibold text-amber-600 mt-1">{formatPrice(product.price)}</p>
+                      <h3 className="text-base font-medium text-ukire-black">{product.name}</h3>
+                      <p className="text-sm text-ukire-text mt-1">{product.category ? product.category.name : 'Tanpa Kategori'}</p>
+                      <p className="text-sm font-semibold text-ukire-amber mt-1">{formatPrice(product.price)}</p>
                     </Link>
-                    <button onClick={() => handleAddToCart(product.id)} className="mt-3 w-full bg-black text-white py-2 text-sm rounded hover:bg-gray-800 transition-colors">
+                    {/* Tombol Tambah ke Keranjang - Muncul saat hover */}
+                    <button onClick={() => handleAddToCart(product.id)} className="mt-3 w-full bg-ukire-black text-white py-2 text-sm rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-800">
                       Tambah ke Keranjang
                     </button>
                   </div>
@@ -336,7 +300,7 @@ export default function ProdukPage() {
                     <button
                       onClick={() => handlePageChange(pagination.current_page - 1)}
                       disabled={pagination.current_page === 1}
-                      className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:bg-ukire-gray transition-colors text-ukire-text"
                     >
                       &lt;
                     </button>
@@ -344,9 +308,9 @@ export default function ProdukPage() {
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`w-10 h-10 flex items-center justify-center border rounded ${
-                          currentPage === page ? "border-black bg-black text-white" : "border-gray-300"
-                        }`}
+                        className={`w-10 h-10 flex items-center justify-center border rounded-full ${
+                          currentPage === page ? "border-ukire-black bg-ukire-black text-white" : "border-gray-300 hover:bg-ukire-gray text-ukire-text"
+                        } transition-colors`}
                       >
                         {page}
                       </button>
@@ -354,7 +318,7 @@ export default function ProdukPage() {
                     <button
                       onClick={() => handlePageChange(pagination.current_page + 1)}
                       disabled={pagination.current_page === pagination.last_page}
-                      className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:bg-ukire-gray transition-colors text-ukire-text"
                     >
                       &gt;
                     </button>
@@ -366,58 +330,11 @@ export default function ProdukPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto pt-16 pb-8 border-t">
+      {/* Footer di sini */}
+      <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-            {/* About Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ABOUT</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/about/terms">Terms & Privacy</Link></li>
-                <li><Link to="/about">About</Link></li>
-                <li><Link to="/about/our-team">Our Team</Link></li>
-                <li><Link to="/about/showroom">Showroom</Link></li>
-                <li><Link to="/about/careers">Careers</Link></li>
-              </ul>
-            </div>
-            {/* Customer Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">CUSTOMER</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/customer/contact">Contact Us</Link></li>
-                <li><Link to="/customer/trade">Trade Service</Link></li>
-                <li><Link to="/customer/login">Login / Register</Link></li>
-                <li><Link to="/customer/shipping">Shipping & Returns</Link></li>
-                <li><Link to="/customer/faq">FAQs</Link>
-                </li>
-              </ul>
-            </div>
-            {/* Furniture Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">FURNITURE</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/furniture/tables">Tables</Link></li>
-                <li><Link to="/furniture/chairs">Chairs</Link></li>
-                <li><Link to="/furniture/storage">Storage</Link></li>
-                <li><Link to="/furniture/sofas">Sofas</Link></li>
-                <li><Link to="/furniture/bedroom">Bedroom</Link></li>
-              </ul>
-            </div>
-            {/* Accessories Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ACCESSORIES</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/accessories/lighting">Lighting & Decoration</Link></li>
-                <li><Link to="/accessories/textiles">Textiles</Link></li>
-                <li><Link to="/accessories/kitchen">Kitchen & Dining</Link></li>
-                <li><Link to="/accessories/outdoor">Outdoor</Link></li>
-                <li><Link to="/accessories/all">All</Link></li>
-              </ul>
-            </div>
-          </div>
-          {/* Bottom Footer */}
-          <div className="pt-8 border-t text-xs text-gray-500 flex flex-wrap gap-6">
+          <FooterLinks /> {/* Komponen FooterLinks yang sudah ada */}
+          <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
             <Link to="/about">ABOUT US</Link>
             <Link to="/blog">BLOG</Link>
             <Link to="/faq">FAQ</Link>

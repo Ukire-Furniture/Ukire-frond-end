@@ -1,3 +1,19 @@
+/* src/index.css */
+
+/* PENTING: @import untuk font harus di paling atas */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Ini adalah import Tailwind CSS yang bekerja untuk setup Anda */
 @import "tailwindcss";
 
+/* Gaya umum untuk body */
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f3f4f6; /* Warna ukire-gray */
+  color: #374151; /* Warna ukire-text */
+  /* Hapus transition untuk dark mode */
+}
 
+/* Hapus semua styling dark mode dan animasi blob dari sini */

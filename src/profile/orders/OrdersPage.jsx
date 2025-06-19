@@ -1,16 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
 import { User, ShoppingBag, Heart, CreditCard, Settings, LogOut, Search } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
-import { callApi, API_BASE_URL } from "../../utils/api"; // Sesuaikan path utils/api
-import Loading from "../../loading"; // Sesuaikan path loading
-import { isLoggedIn } from "../../main.jsx"; // Sesuaikan path main.jsx
+import { callApi } from "../../utils/api";
+import Loading from "../../loading";
+import { isLoggedIn } from "../../main";
+import Navbar from '../../components/Navbar'; 
+import FooterLinks from '../../landingpage/FooterLinks'; 
 
 export default function OrdersPage() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({}); // Untuk paginasi pesanan
+  const [pagination, setPagination] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
 
   const fetchOrders = useCallback(async (page = 1) => {
@@ -19,7 +21,7 @@ export default function OrdersPage() {
     const token = localStorage.getItem("accessToken");
 
     if (!token) {
-      navigate("/login"); // Redirect jika tidak ada token
+      navigate("/login");
       return;
     }
 
@@ -33,7 +35,6 @@ export default function OrdersPage() {
       console.error("Error fetching orders:", err);
       setError("Gagal memuat riwayat pesanan: " + (err.message || "Terjadi kesalahan."));
       setLoading(false);
-      // Logout jika token tidak valid
       if (err.message && (err.message.includes("Unauthenticated") || err.message.includes("Token"))) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
@@ -111,40 +112,15 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <header className="container mx-auto py-6 px-4 flex items-center">
-        <nav className="flex items-center space-x-6 text-sm">
-          <Link to="/" className="text-gray-500">Home</Link>
-          <Link to="/produk" className="text-gray-500">Produk</Link>
-          <Link to="/pemesanan" className="text-gray-500">Pemesanan</Link>
-          <Link to="/pembayaran" className="text-gray-500">Pembayaran</Link>
-        </nav>
+      {/* Navbar di sini */}
+      <Navbar />
 
-        <div className="flex-1 flex justify-center">
-          <Link to="/" className="flex items-center">
-            <div className="w-3 h-3 bg-black rotate-45 mr-1"></div>
-            <span className="text-2xl font-bold">UKIRE</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center space-x-4 text-sm">
-          {isLoggedIn() ? (
-            <Link to="/profile" className="font-medium">Profile</Link>
-          ) : (
-            <Link to="/login" className="text-gray-700">Login</Link>
-          )}
-          <Link to="/cart" className="flex items-center text-gray-700">
-            <span>Cart(0)</span> {/* Jumlah cart akan diupdate oleh Navbar.jsx */}
-          </Link>
-        </div>
-      </header>
-
-      <main className="flex-1 py-12 bg-gray-50">
+      <main className="flex-1 py-12 bg-ukire-gray">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-light mb-8">PESANAN SAYA</h1>
+          <h1 className="text-3xl font-light mb-8 text-ukire-black">PESANAN SAYA</h1>
 
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar (asumsi userProfile akan disediakan dari Navbar/Layout atau fetched di ProfilePage) */}
+            {/* Sidebar (menggunakan data user dari localStorage) */}
             <div className="lg:w-1/4">
               <div className="bg-white p-6 shadow-sm mb-6 rounded-lg">
                 <div className="flex items-center mb-6">
@@ -152,9 +128,8 @@ export default function OrdersPage() {
                     <User className="h-8 w-8 text-gray-500" />
                   </div>
                   <div>
-                    {/* Data user ini harus diambil dari localStorage atau context */}
-                    <h2 className="font-medium">{localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : 'Pengguna'}</h2>
-                    <p className="text-sm text-gray-500">{localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).email : ''}</p>
+                    <h2 className="font-medium text-ukire-black">{localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : 'Pengguna'}</h2>
+                    <p className="text-sm text-ukire-text">{localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).email : ''}</p>
                   </div>
                 </div>
 
@@ -163,7 +138,7 @@ export default function OrdersPage() {
                     <li>
                       <Link
                         to="/profile"
-                        className="flex items-center py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <User className="h-4 w-4 mr-3" />
                         Profil Saya
@@ -172,7 +147,7 @@ export default function OrdersPage() {
                     <li>
                       <Link
                         to="/profile/orders"
-                        className="flex items-center py-2 px-3 bg-gray-100 font-medium rounded-md"
+                        className="flex items-center py-2 px-3 bg-ukire-gray font-medium rounded-md text-ukire-black"
                       >
                         <ShoppingBag className="h-4 w-4 mr-3" />
                         Pesanan Saya
@@ -181,7 +156,7 @@ export default function OrdersPage() {
                     <li>
                       <Link
                         to="/profile/wishlist"
-                        className="flex items-center py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <Heart className="h-4 w-4 mr-3" />
                         Wishlist
@@ -190,7 +165,7 @@ export default function OrdersPage() {
                     <li>
                       <Link
                         to="/profile/payment"
-                        className="flex items-center py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <CreditCard className="h-4 w-4 mr-3" />
                         Metode Pembayaran
@@ -199,7 +174,7 @@ export default function OrdersPage() {
                     <li>
                       <Link
                         to="/profile/settings"
-                        className="flex items-center py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <Settings className="h-4 w-4 mr-3" />
                         Pengaturan
@@ -208,7 +183,7 @@ export default function OrdersPage() {
                     <li>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center w-full py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <LogOut className="h-4 w-4 mr-3" />
                         Keluar
@@ -223,19 +198,19 @@ export default function OrdersPage() {
             <div className="lg:w-3/4">
               <div className="bg-white p-6 shadow-sm mb-6 rounded-lg">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                  <h2 className="text-xl font-medium mb-4 md:mb-0">Riwayat Pesanan</h2>
+                  <h2 className="text-xl font-medium mb-4 md:mb-0 text-ukire-black">Riwayat Pesanan</h2>
 
                   <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
                     <div className="relative">
                       <input
                         type="text"
                         placeholder="Cari pesanan..."
-                        className="w-full md:w-64 border border-gray-300 px-4 py-2 pr-10 focus:outline-none rounded"
+                        className="w-full md:w-64 border border-gray-300 px-4 py-2 pr-10 focus:outline-none rounded-lg focus:ring-1 focus:ring-ukire-amber text-ukire-text"
                       />
-                      <Search className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
+                      <Search className="absolute right-3 top-2.5 h-4 w-4 text-ukire-text" />
                     </div>
 
-                    <select className="border border-gray-300 px-4 py-2 focus:outline-none rounded">
+                    <select className="border border-gray-300 px-4 py-2 focus:outline-none rounded-lg text-ukire-text">
                       <option value="">Semua Status</option>
                       <option value="pending">Menunggu Pembayaran</option>
                       <option value="processing">Diproses</option>
@@ -248,21 +223,21 @@ export default function OrdersPage() {
 
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b">
+                    <thead className="border-b border-gray-200">
                       <tr>
-                        <th className="text-left py-3 px-4 font-medium text-sm">No. Pesanan</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Tanggal</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Status</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Total</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Aksi</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">No. Pesanan</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">Tanggal</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">Status</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">Total</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
                       {orders.length > 0 ? (
                         orders.map((order) => (
-                          <tr key={order.id} className="border-b">
-                            <td className="py-4 px-4">{order.id}</td>
-                            <td className="py-4 px-4">{new Date(order.created_at).toLocaleDateString('id-ID')}</td>
+                          <tr key={order.id} className="border-b border-gray-200">
+                            <td className="py-4 px-4 text-ukire-text">{order.id}</td>
+                            <td className="py-4 px-4 text-ukire-text">{new Date(order.created_at).toLocaleDateString('id-ID')}</td>
                             <td className="py-4 px-4">
                               <span
                                 className={`inline-block px-2 py-1 text-xs rounded-full ${getOrderStatusClass(order.status)}`}
@@ -270,7 +245,7 @@ export default function OrdersPage() {
                                 {order.status}
                               </span>
                             </td>
-                            <td className="py-4 px-4">{formatPrice(order.total_amount)}</td>
+                            <td className="py-4 px-4 text-ukire-text">{formatPrice(order.total_amount)}</td>
                             <td className="py-4 px-4">
                               <Link
                                 to={`/profile/orders/${order.id}`}
@@ -290,14 +265,13 @@ export default function OrdersPage() {
                   </table>
                 </div>
 
-                {/* Pagination */}
                 {pagination.last_page > 1 && (
                     <div className="mt-6 flex justify-center">
                         <div className="flex space-x-1">
                             <button
-                                onClick={() => handlePageChange(currentPage - 1)}
+                                onClick={() => handlePageChange(pagination.current_page - 1)}
                                 disabled={currentPage === 1}
-                                className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:bg-ukire-gray transition-colors text-ukire-text"
                             >
                                 &lt;
                             </button>
@@ -305,17 +279,17 @@ export default function OrdersPage() {
                                 <button
                                     key={page}
                                     onClick={() => handlePageChange(page)}
-                                    className={`w-10 h-10 flex items-center justify-center border rounded ${
-                                        currentPage === page ? "border-black bg-black text-white" : "border-gray-300"
+                                    className={`w-10 h-10 flex items-center justify-center border rounded-full ${
+                                        currentPage === page ? "border-ukire-black bg-ukire-black text-white" : "border-gray-300 hover:bg-ukire-gray text-ukire-text"
                                     }`}
                                 >
                                     {page}
                                 </button>
                             ))}
                             <button
-                                onClick={() => handlePageChange(currentPage + 1)}
+                                onClick={() => handlePageChange(pagination.current_page + 1)}
                                 disabled={currentPage === pagination.last_page}
-                                className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:bg-ukire-gray transition-colors text-ukire-text"
                             >
                                 &gt;
                             </button>
@@ -328,61 +302,11 @@ export default function OrdersPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto pt-16 pb-8 border-t">
+      {/* Footer di sini */}
+      <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-            {/* About Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ABOUT</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/about/terms">Terms & Privacy</Link></li>
-                <li><Link to="/about">About</Link></li>
-                <li><Link to="/about/our-team">Our Team</Link></li>
-                <li><Link to="/about/showroom">Showroom</Link></li>
-                <li><Link to="/about/careers">Careers</Link></li>
-              </ul>
-            </div>
-
-            {/* Customer Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">CUSTOMER</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/customer/contact">Contact Us</Link></li>
-                <li><Link to="/customer/trade">Trade Service</Link></li>
-                <li><Link to="/customer/login">Login / Register</Link></li>
-                <li><Link to="/customer/shipping">Shipping & Returns</Link></li>
-                <li><Link to="/customer/faq">FAQs</Link></li>
-              </ul>
-            </div>
-
-            {/* Furniture Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">FURNITURE</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/furniture/tables">Tables</Link></li>
-                <li><Link to="/furniture/chairs">Chairs</Link></li>
-                <li><Link to="/furniture/storage">Storage</Link></li>
-                <li><Link to="/furniture/sofas">Sofas</Link></li>
-                <li><Link to="/furniture/bedroom">Bedroom</Link></li>
-              </ul>
-            </div>
-
-            {/* Accessories Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ACCESSORIES</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/accessories/lighting">Lighting & Decoration</Link></li>
-                <li><Link to="/accessories/textiles">Textiles</Link></li>
-                <li><Link to="/accessories/kitchen">Kitchen & Dining</Link></li>
-                <li><Link to="/accessories/outdoor">Outdoor</Link></li>
-                <li><Link to="/accessories/all">All</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Footer */}
-          <div className="pt-8 border-t text-xs text-gray-500 flex flex-wrap gap-6">
+          <FooterLinks /> 
+          <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
             <Link to="/about">ABOUT US</Link>
             <Link to="/blog">BLOG</Link>
             <Link to="/faq">FAQ</Link>

@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { callApi } from "../utils/api"; // Impor callApi
+import { callApi } from "../utils/api";
+import Navbar from '../components/Navbar'; // Impor Navbar
+import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
 
-// Fungsi isLoggedIn tetap seperti di LoginPage
 function isLoggedIn() {
   return !!localStorage.getItem("accessToken");
 }
@@ -15,7 +16,7 @@ export default function RegisterPage() {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null); // State untuk pesan sukses
+  const [success, setSuccess] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +24,6 @@ export default function RegisterPage() {
     setError(null);
     setSuccess(null);
 
-    // Validasi sederhana di client-side
     if (password !== passwordConfirmation) {
       setError("Konfirmasi password tidak cocok.");
       setLoading(false);
@@ -43,13 +43,27 @@ export default function RegisterPage() {
       setEmail("");
       setPassword("");
       setPasswordConfirmation("");
-      // Redirect ke login setelah beberapa detik
       setTimeout(() => {
         navigate("/login"); 
-      }, 2000); // Redirect setelah 2 detik
+      }, 2000); 
     } catch (err) {
       console.error("Register Error:", err);
-      setError(err.message || "Terjadi kesalahan saat registrasi.");
+      // Coba parse error dari backend untuk pesan validasi lebih detail
+      if (err.message) {
+          try {
+              const errorResponse = JSON.parse(err.message);
+              if (errorResponse.errors) {
+                  const validationErrors = Object.values(errorResponse.errors).flat().join('\n');
+                  setError("Validasi Gagal:\n" + validationErrors);
+              } else {
+                  setError(errorResponse.message || "Terjadi kesalahan saat registrasi.");
+              }
+          } catch (parseError) {
+              setError(err.message || "Terjadi kesalahan saat registrasi.");
+          }
+      } else {
+          setError("Terjadi kesalahan saat registrasi.");
+      }
     } finally {
       setLoading(false);
     }
@@ -57,36 +71,13 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation (akan diupdate di Langkah 5) */}
-      <header className="container mx-auto py-6 px-4 flex items-center">
-        <nav className="flex items-center space-x-6 text-sm">
-          <Link to="/" className="text-gray-500">Home</Link>
-          <Link to="/produk" className="text-gray-500">Produk</Link>
-          <Link to="/pemesanan" className="text-gray-500">Pemesanan</Link>
-          <Link to="/pembayaran" className="text-gray-500">Pembayaran</Link>
-        </nav>
-        <div className="flex-1 flex justify-center">
-          <Link to="/" className="flex items-center">
-            <div className="w-3 h-3 bg-black rotate-45 mr-1"></div>
-            <span className="text-2xl font-bold">UKIRE</span>
-          </Link>
-        </div>
-        <div className="flex items-center space-x-4 text-sm">
-          {isLoggedIn() ? (
-            <Link to="/profile" className="font-medium">Profile</Link>
-          ) : (
-            <Link to="/login" className="text-gray-700">Login</Link>
-          )}
-          <Link to="/cart" className="flex items-center text-gray-700">
-            <span>Cart(0)</span>
-          </Link>
-        </div>
-      </header>
+      {/* Navbar di sini */}
+      <Navbar />
 
-      <main className="flex-1 py-12 bg-gray-50">
+      <main className="flex-1 py-12 bg-ukire-gray">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto bg-white p-8 shadow-sm rounded-lg">
-            <h1 className="text-xl font-bold mb-6 text-center">DAFTAR AKUN</h1>
+            <h1 className="text-xl font-bold mb-6 text-center text-ukire-black">DAFTAR AKUN</h1>
 
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -102,13 +93,13 @@ export default function RegisterPage() {
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm mb-1">
+                  <label htmlFor="name" className="block text-sm mb-1 text-ukire-text">
                     Nama Lengkap*
                   </label>
                   <input
                     type="text"
                     id="name"
-                    className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -116,13 +107,13 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm mb-1">
+                  <label htmlFor="email" className="block text-sm mb-1 text-ukire-text">
                     Email*
                   </label>
                   <input
                     type="email"
                     id="email"
-                    className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -132,13 +123,13 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm mb-1">
+                <label htmlFor="password" className="block text-sm mb-1 text-ukire-text">
                   Password*
                 </label>
                 <input
                   type="password"
                   id="password"
-                  className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -147,13 +138,13 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm mb-1">
+                <label htmlFor="confirmPassword" className="block text-sm mb-1 text-ukire-text">
                   Konfirmasi Password*
                 </label>
                 <input
                   type="password"
                   id="confirmPassword"
-                  className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
                   required
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
@@ -162,25 +153,25 @@ export default function RegisterPage() {
               </div>
 
               <div className="flex items-center">
-                <input type="checkbox" id="terms" className="mr-2 rounded" required disabled={loading} />
-                <label htmlFor="terms" className="text-sm">
+                <input type="checkbox" id="terms" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" required disabled={loading} />
+                <label htmlFor="terms" className="text-sm text-ukire-text">
                   Saya menyetujui{" "}
-                  <Link to="/terms" className="text-black hover:underline">
+                  <Link to="/terms" className="text-ukire-black hover:underline">
                     Syarat dan Ketentuan
                   </Link>
                 </label>
               </div>
 
               <div className="flex items-center">
-                <input type="checkbox" id="newsletter" className="mr-2 rounded" disabled={loading} />
-                <label htmlFor="newsletter" className="text-sm">
+                <input type="checkbox" id="newsletter" className="mr-2 rounded text-ukire-amber focus:ring-ukire-amber" disabled={loading} />
+                <label htmlFor="newsletter" className="text-sm text-ukire-text">
                   Berlangganan newsletter untuk mendapatkan informasi terbaru
                 </label>
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-ukire-black text-white py-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? "Memuat..." : "Daftar"}
@@ -188,21 +179,21 @@ export default function RegisterPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-ukire-text">
                 Sudah memiliki akun?{" "}
-                <Link to="/login" className="text-black hover:underline">
+                <Link to="/login" className="text-ukire-black hover:underline">
                   Login disini
                 </Link>
               </p>
             </div>
 
-            <div className="mt-8 pt-6 border-t">
-              <p className="text-sm text-center text-gray-600 mb-4">Atau daftar dengan</p>
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <p className="text-sm text-center text-ukire-text mb-4">Atau daftar dengan</p>
               <div className="grid grid-cols-2 gap-4">
-                <button className="flex items-center justify-center border border-gray-300 py-2 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={loading}>
+                <button className="flex items-center justify-center border border-gray-300 py-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-ukire-text" disabled={loading}>
                   <span className="text-sm">Google</span>
                 </button>
-                <button className="flex items-center justify-center border border-gray-300 py-2 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={loading}>
+                <button className="flex items-center justify-center border border-gray-300 py-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-ukire-text" disabled={loading}>
                   <span className="text-sm">Facebook</span>
                 </button>
               </div>
@@ -211,57 +202,11 @@ export default function RegisterPage() {
         </div>
       </main>
 
-      {/* Footer (tetap seperti sebelumnya) */}
-      <footer className="mt-auto pt-16 pb-8 border-t">
+      {/* Footer di sini */}
+      <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-            {/* About Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ABOUT</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/about/terms">Terms & Privacy</Link></li>
-                <li><Link to="/about">About</Link></li>
-                <li><Link to="/about/our-team">Our Team</Link></li>
-                <li><Link to="/about/showroom">Showroom</Link></li>
-                <li><Link to="/about/careers">Careers</Link></li>
-              </ul>
-            </div>
-            {/* Customer Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">CUSTOMER</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/customer/contact">Contact Us</Link></li>
-                <li><Link to="/customer/trade">Trade Service</Link></li>
-                <li><Link to="/customer/login">Login / Register</Link></li>
-                <li><Link to="/customer/shipping">Shipping & Returns</Link></li>
-                <li><Link to="/customer/faq">FAQs</Link></li>
-              </ul>
-            </div>
-            {/* Furniture Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">FURNITURE</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/furniture/tables">Tables</Link></li>
-                <li><Link to="/furniture/chairs">Chairs</Link></li>
-                <li><Link to="/furniture/storage">Storage</Link></li>
-                <li><Link to="/furniture/sofas">Sofas</Link></li>
-                <li><Link to="/furniture/bedroom">Bedroom</Link></li>
-              </ul>
-            </div>
-            {/* Accessories Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ACCESSORIES</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/accessories/lighting">Lighting & Decoration</Link></li>
-                <li><Link to="/accessories/textiles">Textiles</Link></li>
-                <li><Link to="/accessories/kitchen">Kitchen & Dining</Link></li>
-                <li><Link to="/accessories/outdoor">Outdoor</Link></li>
-                <li><Link to="/accessories/all">All</Link></li>
-              </ul>
-            </div>
-          </div>
-          {/* Bottom Footer */}
-          <div className="pt-8 border-t text-xs text-gray-500 flex flex-wrap gap-6">
+          <FooterLinks /> 
+          <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
             <Link to="/about">ABOUT US</Link>
             <Link to="/blog">BLOG</Link>
             <Link to="/faq">FAQ</Link>

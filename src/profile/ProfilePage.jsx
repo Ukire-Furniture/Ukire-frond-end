@@ -1,14 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import { User, ShoppingBag, Heart, CreditCard, Settings, LogOut } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
-import { callApi, API_BASE_URL } from "../utils/api";
+import { callApi } from "../utils/api";
 import Loading from "../loading";
-import { isLoggedIn } from "../main.jsx";
+import { isLoggedIn } from "../main";
+import Navbar from '../components/Navbar'; // Impor Navbar
+import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
-  const [recentOrders, setRecentOrders] = useState([]); // State untuk pesanan terbaru
+  const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -18,17 +20,15 @@ export default function ProfilePage() {
     const token = localStorage.getItem("accessToken");
 
     if (!token) {
-      navigate("/login"); // Redirect jika tidak ada token
+      navigate("/login");
       return;
     }
 
     try {
-      // Ambil profil user
       const userResponse = await callApi("user", "GET", null, token);
       setUserProfile(userResponse.user);
 
-      // Ambil pesanan terbaru (bisa ditambah filter limit di backend jika perlu)
-      const ordersResponse = await callApi("orders", "GET", { per_page: 3 }, token); // Ambil 3 pesanan terbaru
+      const ordersResponse = await callApi("orders", "GET", { per_page: 3 }, token);
       setRecentOrders(ordersResponse.data);
       
       setLoading(false);
@@ -36,9 +36,8 @@ export default function ProfilePage() {
       console.error("Error fetching user profile or orders:", err);
       setError("Gagal memuat profil atau pesanan: " + (err.message || "Terjadi kesalahan."));
       setLoading(false);
-      // Jika error autentikasi (token expired/invalid), bisa langsung logout
       if (err.message && (err.message.includes("Unauthenticated") || err.message.includes("Token"))) {
-          handleLogout(); // Otomatis logout jika token tidak valid
+          handleLogout();
       }
     }
   }, [navigate]);
@@ -55,7 +54,7 @@ export default function ProfilePage() {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
         alert("Anda telah berhasil logout.");
-        window.location.href = '/login'; // Refresh halaman untuk memastikan status login terupdate
+        window.location.href = '/login'; 
       } catch (error) {
         console.error("Logout failed:", error);
         alert("Gagal logout. Silakan coba lagi.");
@@ -78,6 +77,22 @@ export default function ProfilePage() {
     }).format(price);
   };
 
+  const getOrderStatusClass = (status) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "shipped":
+        return "bg-blue-100 text-blue-800";
+      case "pending":
+      case "processing":
+        return "bg-yellow-100 text-yellow-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -88,11 +103,13 @@ export default function ProfilePage() {
 
   if (!userProfile) {
       return (
-          <div className="min-h-screen flex items-center justify-center">
-              <div className="text-center text-gray-600 text-lg">
-                  Profil pengguna tidak tersedia atau Anda belum login.
-                  <br />
-                  <Link to="/login" className="text-black underline mt-2 inline-block">Login sekarang</Link>
+          <div className="min-h-screen flex items-center justify-center bg-ukire-gray">
+              <div className="text-center">
+                  <h2 className="text-2xl font-medium mb-4 text-ukire-black">Profil pengguna tidak tersedia</h2>
+                  <p className="text-ukire-text mb-8">Anda belum login atau sesi telah berakhir.</p>
+                  <Link to="/login" className="inline-block bg-ukire-black text-white px-6 py-3 hover:bg-gray-800 transition-colors rounded-lg">
+                    Login Sekarang
+                  </Link>
               </div>
           </div>
       );
@@ -100,43 +117,12 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation (sudah dihandle oleh Navbar.jsx) */}
-      <header className="container mx-auto py-6 px-4 flex items-center">
-        <nav className="flex items-center space-x-6 text-sm">
-          <Link to="/" className="text-gray-500">
-            Home
-          </Link>
-          <Link to="/produk" className="text-gray-500">
-            Produk
-          </Link>
-          <Link to="/pemesanan" className="text-gray-500">
-            Pemesanan
-          </Link>
-          <Link to="/pembayaran" className="text-gray-500">
-            Pembayaran
-          </Link>
-        </nav>
+      {/* Navbar di sini */}
+      <Navbar />
 
-        <div className="flex-1 flex justify-center">
-          <Link to="/" className="flex items-center">
-            <div className="w-3 h-3 bg-black rotate-45 mr-1"></div>
-            <span className="text-2xl font-bold">UKIRE</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center space-x-4 text-sm">
-          <Link to="/profile" className="font-medium">
-            {userProfile.name}
-          </Link>
-          <Link to="/cart" className="flex items-center text-gray-700">
-            <span>Cart(0)</span> {/* Jumlah cart akan diupdate oleh Navbar.jsx */}
-          </Link>
-        </div>
-      </header>
-
-      <main className="flex-1 py-12 bg-gray-50">
+      <main className="flex-1 py-12 bg-ukire-gray">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-light mb-8">PROFIL SAYA</h1>
+          <h1 className="text-3xl font-light mb-8 text-ukire-black">PROFIL SAYA</h1>
 
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar */}
@@ -147,15 +133,15 @@ export default function ProfilePage() {
                     <User className="h-8 w-8 text-gray-500" />
                   </div>
                   <div>
-                    <h2 className="font-medium">{userProfile.name}</h2>
-                    <p className="text-sm text-gray-500">{userProfile.email}</p>
+                    <h2 className="font-medium text-ukire-black">{userProfile.name}</h2>
+                    <p className="text-sm text-ukire-text">{userProfile.email}</p>
                   </div>
                 </div>
 
                 <nav>
                   <ul className="space-y-2">
                     <li>
-                      <Link to="/profile" className="flex items-center py-2 px-3 bg-gray-100 font-medium rounded-md">
+                      <Link to="/profile" className="flex items-center py-2 px-3 bg-ukire-gray font-medium rounded-md text-ukire-black">
                         <User className="h-4 w-4 mr-3" />
                         Profil Saya
                       </Link>
@@ -163,7 +149,7 @@ export default function ProfilePage() {
                     <li>
                       <Link
                         to="/profile/orders"
-                        className="flex items-center py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <ShoppingBag className="h-4 w-4 mr-3" />
                         Pesanan Saya
@@ -172,7 +158,7 @@ export default function ProfilePage() {
                     <li>
                       <Link
                         to="/profile/wishlist"
-                        className="flex items-center py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <Heart className="h-4 w-4 mr-3" />
                         Wishlist
@@ -181,7 +167,7 @@ export default function ProfilePage() {
                     <li>
                       <Link
                         to="/profile/payment"
-                        className="flex items-center py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <CreditCard className="h-4 w-4 mr-3" />
                         Metode Pembayaran
@@ -190,7 +176,7 @@ export default function ProfilePage() {
                     <li>
                       <Link
                         to="/profile/settings"
-                        className="flex items-center py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <Settings className="h-4 w-4 mr-3" />
                         Pengaturan
@@ -199,7 +185,7 @@ export default function ProfilePage() {
                     <li>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
+                        className="flex items-center w-full py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
                       >
                         <LogOut className="h-4 w-4 mr-3" />
                         Keluar
@@ -213,89 +199,81 @@ export default function ProfilePage() {
             {/* Main Content */}
             <div className="lg:w-3/4">
               <div className="bg-white p-6 shadow-sm mb-6 rounded-lg">
-                <h2 className="text-xl font-medium mb-6">Informasi Pribadi</h2>
+                <h2 className="text-xl font-medium mb-6 text-ukire-black">Informasi Pribadi</h2>
 
                 <form className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="name" className="block text-sm mb-1">
+                      <label htmlFor="name" className="block text-sm mb-1 text-ukire-text">
                         Nama Lengkap
                       </label>
                       <input
                         type="text"
                         id="name"
-                        className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-1 focus:ring-amber-500"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none"
                         defaultValue={userProfile.name}
-                        readOnly // Karena ini hanya tampilan, nanti bisa diubah jika ada fitur edit profil
+                        readOnly
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm mb-1">
+                    <label htmlFor="email" className="block text-sm mb-1 text-ukire-text">
                       Email
                     </label>
                     <input
-                      type="email"
-                      id="email"
-                      className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-1 focus:ring-amber-500"
-                      defaultValue={userProfile.email}
-                      readOnly
+                        type="email"
+                        id="email"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none"
+                        defaultValue={userProfile.email}
+                        readOnly
                     />
                   </div>
 
-                  {/* Anda bisa tambahkan field lain seperti phone atau address jika ada di data user backend */}
-                  {userProfile.phone_number && ( // Cek jika phone_number ada dari API user
+                  {userProfile.phone_number && (
                     <div>
-                      <label htmlFor="phone" className="block text-sm mb-1">
+                      <label htmlFor="phone" className="block text-sm mb-1 text-ukire-text">
                         Nomor Telepon
                       </label>
                       <input
                         type="tel"
                         id="phone"
-                        className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-1 focus:ring-amber-500"
-                        defaultValue={userProfile.phone_number} // Asumsi dari API namanya phone_number
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none"
+                        defaultValue={userProfile.phone_number}
                         readOnly
                       />
                     </div>
                   )}
-                  {userProfile.address && ( // Cek jika address ada dari API user
+                  {userProfile.address && (
                     <div>
-                      <label htmlFor="address" className="block text-sm mb-1">
+                      <label htmlFor="address" className="block text-sm mb-1 text-ukire-text">
                         Alamat
                       </label>
                       <textarea
                         id="address"
-                        className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-1 focus:ring-amber-500"
-                        defaultValue={userProfile.address} // Asumsi dari API namanya address
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none"
+                        defaultValue={userProfile.address}
                         readOnly
                         rows={3}
                       ></textarea>
                     </div>
                   )}
-
-                  {/* Tombol Simpan (jika ingin mengizinkan edit profil) */}
-                  {/* <div className="pt-4">
-                    <button className="bg-black text-white px-6 py-2 hover:bg-gray-800 transition-colors rounded-md">
-                      Simpan Perubahan
-                    </button>
-                  </div> */}
                 </form>
               </div>
 
-              {/* Alamat Pengiriman (tetap statis atau bisa diintegrasikan nanti) */}
+              {/* Alamat Pengiriman (dapat diintegrasikan nanti) */}
               <div className="bg-white p-6 shadow-sm mb-6 rounded-lg">
-                <h2 className="text-xl font-medium mb-6">Alamat Pengiriman</h2>
+                <h2 className="text-xl font-medium mb-6 text-ukire-black">Alamat Pengiriman</h2>
 
                 <div className="border border-gray-200 p-4 mb-4 rounded-md">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-medium">Alamat Utama</h3>
+                    <h3 className="font-medium text-ukire-black">Alamat Utama</h3>
                     <div className="flex space-x-2">
                       <button className="text-sm text-gray-600 hover:text-black">Edit</button>
                       <button className="text-sm text-gray-600 hover:text-black">Hapus</button>
                     </div>
                   </div>
-                  <p className="text-sm">{userProfile.address || "Belum ada alamat utama"}</p>
+                  <p className="text-sm text-ukire-text">{userProfile.address || "Belum ada alamat utama"}</p>
                 </div>
 
                 <button className="text-sm flex items-center text-gray-600 hover:text-black">
@@ -306,7 +284,7 @@ export default function ProfilePage() {
               {/* Pesanan Terbaru */}
               <div className="bg-white p-6 shadow-sm rounded-lg">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-medium">Pesanan Terbaru</h2>
+                  <h2 className="text-xl font-medium text-ukire-black">Pesanan Terbaru</h2>
                   <Link to="/profile/orders" className="text-sm text-gray-600 hover:text-black">
                     Lihat Semua
                   </Link>
@@ -314,36 +292,30 @@ export default function ProfilePage() {
 
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b">
+                    <thead className="border-b border-gray-200">
                       <tr>
-                        <th className="text-left py-3 px-4 font-medium text-sm">No. Pesanan</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Tanggal</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Status</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Total</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Aksi</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">No. Pesanan</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">Tanggal</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">Status</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">Total</th>
+                        <th className="text-left py-3 px-4 font-medium text-sm text-ukire-black">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
                       {recentOrders.length > 0 ? (
                         recentOrders.map((order) => (
-                          <tr key={order.id} className="border-b">
-                            <td className="py-3 px-4">{order.id}</td>
-                            <td className="py-3 px-4">{new Date(order.created_at).toLocaleDateString('id-ID')}</td>
-                            <td className="py-3 px-4">
+                          <tr key={order.id} className="border-b border-gray-200">
+                            <td className="py-4 px-4 text-ukire-text">{order.id}</td>
+                            <td className="py-4 px-4 text-ukire-text">{new Date(order.created_at).toLocaleDateString('id-ID')}</td>
+                            <td className="py-4 px-4">
                               <span
-                                className={`inline-block px-2 py-1 text-xs rounded-full ${
-                                  order.status === "completed"
-                                    ? "bg-green-100 text-green-800"
-                                    : order.status === "shipped"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : "bg-yellow-100 text-yellow-800"
-                                }`}
+                                className={`inline-block px-2 py-1 text-xs rounded-full ${getOrderStatusClass(order.status)}`}
                               >
                                 {order.status}
                               </span>
                             </td>
-                            <td className="py-3 px-4">{formatPrice(order.total_amount)}</td>
-                            <td className="py-3 px-4">
+                            <td className="py-4 px-4 text-ukire-text">{formatPrice(order.total_amount)}</td>
+                            <td className="py-4 px-4">
                               <Link
                                 to={`/profile/orders/${order.id}`}
                                 className="text-sm text-gray-600 hover:text-black"
@@ -367,57 +339,11 @@ export default function ProfilePage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto pt-16 pb-8 border-t">
+      {/* Footer di sini */}
+      <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-            {/* About Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ABOUT</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/about/terms">Terms & Privacy</Link></li>
-                <li><Link to="/about">About</Link></li>
-                <li><Link to="/about/our-team">Our Team</Link></li>
-                <li><Link to="/about/showroom">Showroom</Link></li>
-                <li><Link to="/about/careers">Careers</Link></li>
-              </ul>
-            </div>
-            {/* Customer Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">CUSTOMER</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/customer/contact">Contact Us</Link></li>
-                <li><Link to="/customer/trade">Trade Service</Link></li>
-                <li><Link to="/customer/login">Login / Register</Link></li>
-                <li><Link to="/customer/shipping">Shipping & Returns</Link></li>
-                <li><Link to="/customer/faq">FAQs</Link></li>
-              </ul>
-            </div>
-            {/* Furniture Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">FURNITURE</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/furniture/tables">Tables</Link></li>
-                <li><Link to="/furniture/chairs">Chairs</Link></li>
-                <li><Link to="/furniture/storage">Storage</Link></li>
-                <li><Link to="/furniture/sofas">Sofas</Link></li>
-                <li><Link to="/furniture/bedroom">Bedroom</Link></li>
-              </ul>
-            </div>
-            {/* Accessories Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ACCESSORIES</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li><Link to="/accessories/lighting">Lighting & Decoration</Link></li>
-                <li><Link to="/accessories/textiles">Textiles</Link></li>
-                <li><Link to="/accessories/kitchen">Kitchen & Dining</Link></li>
-                <li><Link to="/accessories/outdoor">Outdoor</Link></li>
-                <li><Link to="/accessories/all">All</Link></li>
-              </ul>
-            </div>
-          </div>
-          {/* Bottom Footer */}
-          <div className="pt-8 border-t text-xs text-gray-500 flex flex-wrap gap-6">
+          <FooterLinks /> 
+          <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
             <Link to="/about">ABOUT US</Link>
             <Link to="/blog">BLOG</Link>
             <Link to="/faq">FAQ</Link>

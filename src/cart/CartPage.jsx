@@ -1,25 +1,147 @@
 import { Link } from "react-router-dom";
 import { Minus, Plus, X } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { callApi, API_BASE_URL } from "../utils/api"; 
+import Loading from "../loading";
+import { isLoggedIn } from "../main";
+import Navbar from '../components/Navbar'; // Impor Navbar
+import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
 
 export default function CartPage() {
-  const cartItems = [
-    {
-      id: 1,
-      name: "Lemari Ukir Klasik",
-      price: 12500000,
-      quantity: 1,
-      image: "/images/kayu/kursi.png",
-    },
-    {
-      id: 3,
-      name: "Set Kursi Tamu Ukir",
-      price: 15900000,
-      quantity: 1,
-      image: "/images/kayu/kursi.png",
-    },
-  ];
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cartTotal, setCartTotal] = useState(0);
+
+  const fetchCartItems = useCallback(async () => {
+    console.log("Memulai fetchCartItems di CartPage...");
+    setLoading(true);
+    setError(null);
+    const token = localStorage.getItem("accessToken");
+    console.log("Token yang ditemukan:", token ? "Ada" : "Tidak ada");
+
+    if (!token) {
+      setCartItems([]);
+      setCartTotal(0);
+      setError("Anda perlu login untuk melihat keranjang belanja.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await callApi("cart", "GET", null, token);
+      console.log("Respons API Keranjang:", response);
+
+      if (response.data && response.data.length === 0) {
+        setError("Keranjang belanja Anda kosong. Silakan belanja terlebih dahulu.");
+        setCartItems([]);
+        setCartTotal(0);
+      } else if (response.data) {
+        setCartItems(response.data);
+        setCartTotal(response.cart_total);
+        console.log("State cartItems setelah di-set:", response.data);
+        console.log("State cartTotal setelah di-set:", response.cart_total);
+      } else {
+          setError("Gagal memuat keranjang: Respon data tidak valid.");
+          setCartItems([]);
+          setCartTotal(0);
+      }
+      setLoading(false);
+
+      if (response.message && (response.message.includes("Unauthenticated") || response.message.includes("Token"))) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        alert("Sesi Anda berakhir. Silakan login kembali.");
+        window.location.href = '/login';
+      }
+
+    } catch (err) {
+      console.error("Error fetching cart items (catch block):", err);
+      setError("Gagal memuat keranjang belanja: " + (err.message || "Terjadi kesalahan."));
+      setCartItems([]);
+      setCartTotal(0);
+      if (err.message && (err.message.includes("Unauthenticated") || err.message.includes("Token"))) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        alert("Sesi Anda berakhir. Silakan login kembali.");
+        window.location.href = '/login';
+      }
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCartItems();
+  }, [fetchCartItems]);
+
+  const handleUpdateQuantity = async (itemId, newQuantity) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+        alert("Silakan login untuk mengubah keranjang.");
+        return;
+    }
+    if (newQuantity < 0) return;
+
+    setLoading(true);
+    try {
+      await callApi(`cart/update/${itemId}`, "PUT", { quantity: newQuantity }, token);
+      fetchCartItems();
+    } catch (err) {
+      console.error("Error updating cart item quantity:", err);
+      alert("Gagal memperbarui kuantitas: " + (err.message || "Terjadi kesalahan."));
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const handleRemoveItem = async (itemId) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+        alert("Silakan login untuk menghapus item dari keranjang.");
+        return;
+    }
+    if (window.confirm("Apakah Anda yakin ingin menghapus item ini dari keranjang?")) {
+        setLoading(true);
+        try {
+            await callApi(`cart/remove/${itemId}`, "DELETE", null, token);
+            fetchCartItems();
+        } catch (err) {
+            console.error("Error removing cart item:", err);
+            alert("Gagal menghapus item: " + (err.message || "Terjadi kesalahan."));
+        } finally {
+            setLoading(false);
+        }
+    }
+  };
+
+  const handleClearCart = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+        alert("Silakan login untuk mengosongkan keranjang.");
+        return;
+    }
+    if (window.confirm("Apakah Anda yakin ingin mengosongkan keranjang belanja Anda?")) {
+        setLoading(true);
+        try {
+            await callApi("cart/clear", "POST", null, token);
+            alert("Keranjang berhasil dikosongkan!");
+            fetchCartItems();
+        } catch (err) {
+            console.error("Error clearing cart:", err);
+            alert("Gagal mengosongkan keranjang: " + (err.message || "Terjadi kesalahan."));
+        } finally {
+            setLoading(false);
+        }
+    }
+  };
 
   const formatPrice = (price) => {
+    if (typeof price !== 'number') {
+        price = parseFloat(price);
+    }
+    if (isNaN(price)) {
+        return "Rp 0";
+    }
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
@@ -28,55 +150,48 @@ export default function CartPage() {
     }).format(price);
   };
 
-  const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const shipping = 250000;
-  const total = subtotal + shipping;
+  const totalWithShipping = cartTotal + shipping;
+
+  if (loading && cartItems.length === 0) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500 text-lg">{error}</div>;
+  }
+
+  if (cartItems.length === 0 && !loading && !error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-ukire-gray">
+        <div className="text-center">
+          <h2 className="text-2xl font-medium mb-4 text-ukire-black">Keranjang Belanja Anda Kosong</h2>
+          <p className="text-ukire-text mb-8">Silakan tambahkan produk ke keranjang belanja Anda</p>
+          <Link
+            to="/produk"
+            className="inline-block bg-ukire-black text-white px-6 py-3 hover:bg-gray-800 transition-colors rounded-lg"
+          >
+            Belanja Sekarang
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <header className="container mx-auto py-6 px-4 flex items-center">
-        <nav className="flex items-center space-x-6 text-sm">
-          <Link to="/" className="text-gray-500">
-            Home
-          </Link>
-          <Link to="/produk" className="text-gray-500">
-            Produk
-          </Link>
-          <Link to="/pemesanan" className="text-gray-500">
-            Pemesanan
-          </Link>
-          <Link to="/pembayaran" className="text-gray-500">
-            Pembayaran
-          </Link>
-        </nav>
+      {/* Navbar di sini */}
+      <Navbar />
 
-        <div className="flex-1 flex justify-center">
-          <Link to="/" className="flex items-center">
-            <div className="w-3 h-3 bg-black rotate-45 mr-1"></div>
-            <span className="text-2xl font-bold">UKIRE</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center space-x-4 text-sm">
-          <Link to="/login" className="text-gray-700">
-            Login
-          </Link>
-          <Link to="/cart" className="flex items-center font-medium">
-            <span>Cart({cartItems.length})</span>
-          </Link>
-        </div>
-      </header>
-
-      <main className="flex-1 py-12">
+      <main className="flex-1 py-12 bg-ukire-gray">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-light mb-8">KERANJANG BELANJA</h1>
+          <h1 className="text-3xl font-light mb-8 text-ukire-black">KERANJANG BELANJA</h1>
 
           {cartItems.length > 0 ? (
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Cart Items */}
               <div className="lg:w-2/3">
-                <div className="border-b pb-4 mb-4 hidden md:grid md:grid-cols-12 text-sm font-medium">
+                <div className="border-b pb-4 mb-4 hidden md:grid md:grid-cols-12 text-sm font-medium text-ukire-black">
                   <div className="md:col-span-6">Produk</div>
                   <div className="md:col-span-2 text-center">Harga</div>
                   <div className="md:col-span-2 text-center">Jumlah</div>
@@ -84,68 +199,69 @@ export default function CartPage() {
                 </div>
 
                 {cartItems.map((item) => (
-                  <div key={item.id} className="border-b py-6 md:grid md:grid-cols-12 items-center">
-                    <div className="md:col-span-6 flex items-center mb-4 md:mb-0">
-                      <div className="w-20 h-20 bg-gray-100 flex-shrink-0 mr-4">
+                  <div key={item.id} className="border-b border-gray-200 py-6 md:grid md:grid-cols-12 items-center bg-white rounded-lg shadow-sm mb-4">
+                    <div className="md:col-span-6 flex items-center mb-4 md:mb-0 p-2">
+                      <div className="w-20 h-20 bg-ukire-gray flex-shrink-0 rounded-lg overflow-hidden">
                         <img
-                          src={item.image || "/placeholder.svg"}
+                          src={item.image_path ? `${API_BASE_URL.replace('/api', '')}/storage/${item.image_path}` : "https://placehold.co/80x80/cccccc/333333?text=No+Image"}
                           alt={item.name}
                           width={80}
                           height={80}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div>
-                        <h3 className="font-medium">{item.name}</h3>
-                        <button className="text-sm text-gray-500 flex items-center mt-1">
+                      <div className="ml-4 flex-1">
+                        <h3 className="font-medium text-ukire-black">{item.name}</h3>
+                        <p className="text-sm text-ukire-text">Kategori: {item.category}</p>
+                        <button onClick={() => handleRemoveItem(item.id)} className="text-sm text-red-500 flex items-center mt-1 hover:underline">
                           <X className="h-3 w-3 mr-1" />
                           Hapus
                         </button>
                       </div>
                     </div>
 
-                    <div className="md:col-span-2 text-center mb-4 md:mb-0">
-                      <div className="md:hidden text-sm text-gray-500 mb-1">Harga:</div>
+                    <div className="md:col-span-2 text-center mb-4 md:mb-0 text-ukire-text">
+                      <div className="md:hidden text-sm text-ukire-text mb-1">Harga:</div>
                       <div>{formatPrice(item.price)}</div>
                     </div>
 
                     <div className="md:col-span-2 flex justify-center mb-4 md:mb-0">
-                      <div className="md:hidden text-sm text-gray-500 mb-1 mr-2">Jumlah:</div>
-                      <div className="flex items-center border border-gray-300">
-                        <button className="px-2 py-1 hover:bg-gray-100">
-                          <Minus className="h-3 w-3" />
+                      <div className="md:hidden text-sm text-ukire-text mb-1 mr-2">Jumlah:</div>
+                      <div className="flex items-center border border-gray-300 rounded-lg">
+                        <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 hover:bg-ukire-gray rounded-l-lg">
+                          <Minus className="h-3 w-3 text-ukire-text" />
                         </button>
-                        <span className="px-3 py-1 border-x border-gray-300">{item.quantity}</span>
-                        <button className="px-2 py-1 hover:bg-gray-100">
-                          <Plus className="h-3 w-3" />
+                        <span className="px-3 py-1 border-x border-gray-300 text-ukire-text">{item.quantity}</span>
+                        <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} className="px-2 py-1 hover:bg-ukire-gray rounded-r-lg">
+                          <Plus className="h-3 w-3 text-ukire-text" />
                         </button>
                       </div>
                     </div>
 
-                    <div className="md:col-span-2 text-center">
-                      <div className="md:hidden text-sm text-gray-500 mb-1">Total:</div>
-                      <div className="font-medium">{formatPrice(item.price * item.quantity)}</div>
+                    <div className="md:col-span-2 text-center text-ukire-black">
+                      <div className="md:hidden text-sm text-ukire-text mb-1">Total:</div>
+                      <div className="font-medium">{formatPrice(item.total_item_price)}</div>
                     </div>
                   </div>
                 ))}
 
                 <div className="flex justify-between items-center mt-8">
-                  <Link to="/produk" className="text-sm hover:underline">
+                  <Link to="/produk" className="text-sm hover:underline text-ukire-text">
                     ← Lanjutkan Belanja
                   </Link>
-                  <button className="text-sm hover:underline">Kosongkan Keranjang</button>
+                  <button onClick={handleClearCart} className="text-sm hover:underline text-red-500">Kosongkan Keranjang</button>
                 </div>
               </div>
 
               {/* Cart Summary */}
               <div className="lg:w-1/3">
-                <div className="bg-gray-50 p-6">
-                  <h2 className="text-xl font-medium mb-6">Ringkasan Pesanan</h2>
+                <div className="bg-white p-6 rounded-lg shadow-sm sticky top-6">
+                  <h2 className="text-xl font-medium mb-6 text-ukire-black">Ringkasan Pesanan</h2>
 
-                  <div className="space-y-3 mb-6">
+                  <div className="space-y-3 mb-6 text-ukire-text">
                     <div className="flex justify-between">
                       <span>Subtotal</span>
-                      <span>{formatPrice(subtotal)}</span>
+                      <span>{formatPrice(cartTotal)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Estimasi Pengiriman</span>
@@ -153,41 +269,41 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  <div className="border-t pt-4 mb-6">
-                    <div className="flex justify-between font-medium">
+                  <div className="border-t border-gray-200 pt-4 mb-6">
+                    <div className="flex justify-between font-medium text-ukire-black">
                       <span>Total</span>
-                      <span>{formatPrice(total)}</span>
+                      <span>{formatPrice(totalWithShipping)}</span>
                     </div>
                   </div>
 
                   <Link
                     to="/pemesanan"
-                    className="block w-full bg-black text-white text-center py-3 hover:bg-gray-800 transition-colors"
+                    className="block w-full bg-ukire-black text-white text-center py-3 rounded-lg hover:bg-gray-800 transition-colors"
                   >
                     Lanjut ke Pemesanan
                   </Link>
 
                   <div className="mt-6">
-                    <h3 className="text-sm font-medium mb-3">Kode Promo</h3>
+                    <h3 className="text-sm font-medium mb-3 text-ukire-black">Kode Promo</h3>
                     <div className="flex">
                       <input
                         type="text"
                         placeholder="Masukkan kode promo"
-                        className="flex-1 border border-gray-300 px-4 py-2 focus:outline-none"
+                        className="flex-1 border border-gray-300 px-4 py-2 focus:outline-none rounded-l-lg"
                       />
-                      <button className="bg-black text-white px-4 py-2 text-sm uppercase">TERAPKAN</button>
+                      <button className="bg-ukire-black text-white px-4 py-2 text-sm uppercase rounded-r-lg">TERAPKAN</button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-medium mb-4">Keranjang Belanja Anda Kosong</h2>
-              <p className="text-gray-500 mb-8">Silakan tambahkan produk ke keranjang belanja Anda</p>
+            <div className="text-center py-12 bg-ukire-gray rounded-lg shadow-md">
+              <h2 className="text-2xl font-medium mb-4 text-ukire-black">Keranjang Belanja Anda Kosong</h2>
+              <p className="text-ukire-text mb-8">Silakan tambahkan produk ke keranjang belanja Anda</p>
               <Link
                 to="/produk"
-                className="inline-block bg-black text-white px-6 py-3 hover:bg-gray-800 transition-colors"
+                className="inline-block bg-ukire-black text-white px-6 py-3 hover:bg-gray-800 transition-colors rounded-lg"
               >
                 Belanja Sekarang
               </Link>
@@ -196,101 +312,11 @@ export default function CartPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto pt-16 pb-8 border-t">
+      {/* Footer di sini */}
+      <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-            {/* About Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ABOUT</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li>
-                  <Link to="/about/terms">Terms & Privacy</Link>
-                </li>
-                <li>
-                  <Link to="/about">About</Link>
-                </li>
-                <li>
-                  <Link to="/about/our-team">Our Team</Link>
-                </li>
-                <li>
-                  <Link to="/about/showroom">Showroom</Link>
-                </li>
-                <li>
-                  <Link to="/about/careers">Careers</Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Customer Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">CUSTOMER</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li>
-                  <Link to="/customer/contact">Contact Us</Link>
-                </li>
-                <li>
-                  <Link to="/customer/trade">Trade Service</Link>
-                </li>
-                <li>
-                  <Link to="/customer/login">Login / Register</Link>
-                </li>
-                <li>
-                  <Link to="/customer/shipping">Shipping & Returns</Link>
-                </li>
-                <li>
-                  <Link to="/customer/faq">FAQs</Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Furniture Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">FURNITURE</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li>
-                  <Link to="/furniture/tables">Tables</Link>
-                </li>
-                <li>
-                  <Link to="/furniture/chairs">Chairs</Link>
-                </li>
-                <li>
-                  <Link to="/furniture/storage">Storage</Link>
-                </li>
-                <li>
-                  <Link to="/furniture/sofas">Sofas</Link>
-                </li>
-                <li>
-                  <Link to="/furniture/bedroom">Bedroom</Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Accessories Column */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">ACCESSORIES</h3>
-              <ul className="space-y-2 text-xs text-gray-500">
-                <li>
-                  <Link to="/accessories/lighting">Lighting & Decoration</Link>
-                </li>
-                <li>
-                  <Link to="/accessories/textiles">Textiles</Link>
-                </li>
-                <li>
-                  <Link to="/accessories/kitchen">Kitchen & Dining</Link>
-                </li>
-                <li>
-                  <Link to="/accessories/outdoor">Outdoor</Link>
-                </li>
-                <li>
-                  <Link to="/accessories/all">All</Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Footer */}
-          <div className="pt-8 border-t text-xs text-gray-500 flex flex-wrap gap-6">
+          <FooterLinks /> 
+          <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
             <Link to="/about">ABOUT US</Link>
             <Link to="/blog">BLOG</Link>
             <Link to="/faq">FAQ</Link>
