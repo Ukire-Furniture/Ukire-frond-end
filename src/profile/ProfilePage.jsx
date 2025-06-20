@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { User, ShoppingBag, Heart, CreditCard, Settings, LogOut } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
-import { callApi } from "../utils/api";
+import { callApi, API_BASE_URL } from "../utils/api";
 import Loading from "../loading";
-import { isLoggedIn } from "../main";
-import Navbar from '../components/Navbar'; // Impor Navbar
-import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
+import { isLoggedIn } from "../main.jsx";
+import Navbar from '../components/Navbar';
+import FooterLinks from '../landingpage/FooterLinks';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -37,7 +37,10 @@ export default function ProfilePage() {
       setError("Gagal memuat profil atau pesanan: " + (err.message || "Terjadi kesalahan."));
       setLoading(false);
       if (err.message && (err.message.includes("Unauthenticated") || err.message.includes("Token"))) {
-          handleLogout();
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("user");
+          alert("Sesi Anda berakhir. Silakan login kembali.");
+          window.location.href = '/login';
       }
     }
   }, [navigate]);
@@ -54,7 +57,7 @@ export default function ProfilePage() {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
         alert("Anda telah berhasil logout.");
-        window.location.href = '/login'; 
+        window.location.href = '/login';
       } catch (error) {
         console.error("Logout failed:", error);
         alert("Gagal logout. Silakan coba lagi.");
@@ -98,18 +101,24 @@ export default function ProfilePage() {
   }
 
   if (error) {
-    return <div className="min-h-screen flex items-center justify-center text-red-500 text-lg">{error}</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 text-lg">
+        {error}
+        <br/>
+        <Link to="/login" className="text-ukire-black underline mt-2 inline-block hover:text-ukire-amber">Login kembali</Link>
+      </div>
+    );
   }
 
   if (!userProfile) {
       return (
           <div className="min-h-screen flex items-center justify-center bg-ukire-gray">
               <div className="text-center">
-                  <h2 className="text-2xl font-medium mb-4 text-ukire-black">Profil pengguna tidak tersedia</h2>
-                  <p className="text-ukire-text mb-8">Anda belum login atau sesi telah berakhir.</p>
-                  <Link to="/login" className="inline-block bg-ukire-black text-white px-6 py-3 hover:bg-gray-800 transition-colors rounded-lg">
-                    Login Sekarang
-                  </Link>
+                  <h2 className="text-2xl font-medium mb-4 text-ukire-black">Profil pengguna tidak tersedia.</h2>
+                  <p className="text-ukire-text mb-8">
+                    Silakan login kembali.
+                  </p>
+                  <Link to="/login" className="text-ukire-black underline mt-2 inline-block hover:text-ukire-amber">Login sekarang</Link>
               </div>
           </div>
       );
@@ -117,7 +126,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar di sini */}
       <Navbar />
 
       <main className="flex-1 py-12 bg-ukire-gray">
@@ -185,7 +193,7 @@ export default function ProfilePage() {
                     <li>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
+                        className="flex items-center w-full py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md text-left"
                       >
                         <LogOut className="h-4 w-4 mr-3" />
                         Keluar
@@ -196,7 +204,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Main Content */}
             <div className="lg:w-3/4">
               <div className="bg-white p-6 shadow-sm mb-6 rounded-lg">
                 <h2 className="text-xl font-medium mb-6 text-ukire-black">Informasi Pribadi</h2>
@@ -210,9 +217,9 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         id="name"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
                         defaultValue={userProfile.name}
-                        readOnly
+                        readOnly 
                       />
                     </div>
                   </div>
@@ -222,15 +229,15 @@ export default function ProfilePage() {
                       Email
                     </label>
                     <input
-                        type="email"
-                        id="email"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none"
-                        defaultValue={userProfile.email}
-                        readOnly
+                      type="email"
+                      id="email"
+                      className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
+                      defaultValue={userProfile.email}
+                      readOnly
                     />
                   </div>
 
-                  {userProfile.phone_number && (
+                  {userProfile.phone_number && ( 
                     <div>
                       <label htmlFor="phone" className="block text-sm mb-1 text-ukire-text">
                         Nomor Telepon
@@ -238,30 +245,30 @@ export default function ProfilePage() {
                       <input
                         type="tel"
                         id="phone"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
                         defaultValue={userProfile.phone_number}
                         readOnly
                       />
                     </div>
                   )}
-                  {userProfile.address && (
+                  {userProfile.address && ( 
                     <div>
                       <label htmlFor="address" className="block text-sm mb-1 text-ukire-text">
                         Alamat
                       </label>
                       <textarea
                         id="address"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
                         defaultValue={userProfile.address}
                         readOnly
                         rows={3}
                       ></textarea>
                     </div>
                   )}
+
                 </form>
               </div>
 
-              {/* Alamat Pengiriman (dapat diintegrasikan nanti) */}
               <div className="bg-white p-6 shadow-sm mb-6 rounded-lg">
                 <h2 className="text-xl font-medium mb-6 text-ukire-black">Alamat Pengiriman</h2>
 
@@ -269,23 +276,22 @@ export default function ProfilePage() {
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-medium text-ukire-black">Alamat Utama</h3>
                     <div className="flex space-x-2">
-                      <button className="text-sm text-gray-600 hover:text-black">Edit</button>
-                      <button className="text-sm text-gray-600 hover:text-black">Hapus</button>
+                      <button className="text-sm text-gray-600 hover:text-ukire-black">Edit</button>
+                      <button className="text-sm text-gray-600 hover:text-ukire-black">Hapus</button>
                     </div>
                   </div>
                   <p className="text-sm text-ukire-text">{userProfile.address || "Belum ada alamat utama"}</p>
                 </div>
 
-                <button className="text-sm flex items-center text-gray-600 hover:text-black">
+                <button className="text-sm flex items-center text-gray-600 hover:text-ukire-black">
                   + Tambah Alamat Baru
                 </button>
               </div>
 
-              {/* Pesanan Terbaru */}
               <div className="bg-white p-6 shadow-sm rounded-lg">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-medium text-ukire-black">Pesanan Terbaru</h2>
-                  <Link to="/profile/orders" className="text-sm text-gray-600 hover:text-black">
+                  <Link to="/profile/orders" className="text-sm text-gray-600 hover:text-ukire-black">
                     Lihat Semua
                   </Link>
                 </div>
@@ -304,7 +310,7 @@ export default function ProfilePage() {
                     <tbody>
                       {recentOrders.length > 0 ? (
                         recentOrders.map((order) => (
-                          <tr key={order.id} className="border-b border-gray-200">
+                          <tr key={order.id} className="border-b border-gray-100">
                             <td className="py-4 px-4 text-ukire-text">{order.id}</td>
                             <td className="py-4 px-4 text-ukire-text">{new Date(order.created_at).toLocaleDateString('id-ID')}</td>
                             <td className="py-4 px-4">
@@ -318,7 +324,7 @@ export default function ProfilePage() {
                             <td className="py-4 px-4">
                               <Link
                                 to={`/profile/orders/${order.id}`}
-                                className="text-sm text-gray-600 hover:text-black"
+                                className="text-sm text-gray-600 hover:text-ukire-black"
                               >
                                 Detail
                               </Link>
@@ -327,19 +333,19 @@ export default function ProfilePage() {
                         ))
                       ) : (
                         <tr>
-                            <td colSpan="5" className="text-center py-4 text-gray-500">Tidak ada pesanan terbaru.</td>
+                            <td colSpan="5" className="text-center py-4 text-ukire-text">Tidak ada pesanan terbaru.</td>
                         </tr>
                       )}
                     </tbody>
                   </table>
                 </div>
+
               </div>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Footer di sini */}
       <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
           <FooterLinks /> 

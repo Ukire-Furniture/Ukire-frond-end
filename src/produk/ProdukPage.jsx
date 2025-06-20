@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import { callApi, API_BASE_URL } from "../utils/api";
 import Loading from "../loading";
 import { isLoggedIn } from "../main"; 
-import Navbar from '../components/Navbar'; // Impor Navbar
-import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
+import Navbar from '../components/Navbar'; 
+import FooterLinks from '../landingpage/FooterLinks'; 
 
 export default function ProdukPage() {
   const [categories, setCategories] = useState([]);
@@ -155,7 +155,7 @@ export default function ProdukPage() {
               <input
                 type="text"
                 placeholder="Cari produk..."
-                className="w-full border border-gray-300 px-4 py-2 pr-10 focus:outline-none rounded-lg focus:ring-1 focus:ring-amber-500"
+                className="w-full border border-gray-300 px-4 py-2 pr-10 focus:outline-none rounded-lg focus:ring-1 focus:ring-ukire-amber"
                 value={searchQuery}
                 onChange={handleSearchChange}
               />
@@ -333,7 +333,7 @@ export default function ProdukPage() {
       {/* Footer di sini */}
       <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
-          <FooterLinks /> {/* Komponen FooterLinks yang sudah ada */}
+          <FooterLinks /> 
           <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
             <Link to="/about">ABOUT US</Link>
             <Link to="/blog">BLOG</Link>

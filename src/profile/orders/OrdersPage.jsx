@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { User, ShoppingBag, Heart, CreditCard, Settings, LogOut, Search } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
-import { callApi } from "../../utils/api";
+import { callApi, API_BASE_URL } from "../../utils/api";
 import Loading from "../../loading";
-import { isLoggedIn } from "../../main";
-import Navbar from '../../components/Navbar'; 
-import FooterLinks from '../../landingpage/FooterLinks'; 
+import { isLoggedIn } from "../../main.jsx";
+import Navbar from '../../components/Navbar';
+import FooterLinks from '../../landingpage/FooterLinks';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -107,12 +107,17 @@ export default function OrdersPage() {
   }
 
   if (error) {
-    return <div className="min-h-screen flex items-center justify-center text-red-500 text-lg">{error}</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 text-lg">
+        {error}
+        <br/>
+        <Link to="/login" className="text-ukire-black underline mt-2 inline-block hover:text-ukire-amber">Login kembali</Link>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar di sini */}
       <Navbar />
 
       <main className="flex-1 py-12 bg-ukire-gray">
@@ -120,7 +125,7 @@ export default function OrdersPage() {
           <h1 className="text-3xl font-light mb-8 text-ukire-black">PESANAN SAYA</h1>
 
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar (menggunakan data user dari localStorage) */}
+            {/* Sidebar (asumsi userProfile akan disediakan dari Navbar/Layout atau fetched di ProfilePage) */}
             <div className="lg:w-1/4">
               <div className="bg-white p-6 shadow-sm mb-6 rounded-lg">
                 <div className="flex items-center mb-6">
@@ -183,7 +188,7 @@ export default function OrdersPage() {
                     <li>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md"
+                        className="flex items-center w-full py-2 px-3 text-ukire-text hover:bg-ukire-gray rounded-md text-left"
                       >
                         <LogOut className="h-4 w-4 mr-3" />
                         Keluar
@@ -205,7 +210,7 @@ export default function OrdersPage() {
                       <input
                         type="text"
                         placeholder="Cari pesanan..."
-                        className="w-full md:w-64 border border-gray-300 px-4 py-2 pr-10 focus:outline-none rounded-lg focus:ring-1 focus:ring-ukire-amber text-ukire-text"
+                        className="w-full md:w-64 border border-gray-300 px-4 py-2 pr-10 focus:outline-none rounded-lg focus:ring-1 focus:ring-ukire-amber"
                       />
                       <Search className="absolute right-3 top-2.5 h-4 w-4 text-ukire-text" />
                     </div>
@@ -235,7 +240,7 @@ export default function OrdersPage() {
                     <tbody>
                       {orders.length > 0 ? (
                         orders.map((order) => (
-                          <tr key={order.id} className="border-b border-gray-200">
+                          <tr key={order.id} className="border-b border-gray-100">
                             <td className="py-4 px-4 text-ukire-text">{order.id}</td>
                             <td className="py-4 px-4 text-ukire-text">{new Date(order.created_at).toLocaleDateString('id-ID')}</td>
                             <td className="py-4 px-4">
@@ -249,7 +254,7 @@ export default function OrdersPage() {
                             <td className="py-4 px-4">
                               <Link
                                 to={`/profile/orders/${order.id}`}
-                                className="text-sm text-gray-600 hover:text-black"
+                                className="text-sm text-gray-600 hover:text-ukire-black"
                               >
                                 Detail
                               </Link>
@@ -258,19 +263,20 @@ export default function OrdersPage() {
                         ))
                       ) : (
                         <tr>
-                            <td colSpan="5" className="text-center py-4 text-gray-500">Tidak ada pesanan ditemukan.</td>
+                            <td colSpan="5" className="text-center py-4 text-ukire-text">Tidak ada pesanan ditemukan.</td>
                         </tr>
                       )}
                     </tbody>
                   </table>
                 </div>
 
+                {/* Pagination */}
                 {pagination.last_page > 1 && (
                     <div className="mt-6 flex justify-center">
                         <div className="flex space-x-1">
                             <button
                                 onClick={() => handlePageChange(pagination.current_page - 1)}
-                                disabled={currentPage === 1}
+                                disabled={pagination.current_page === 1}
                                 className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:bg-ukire-gray transition-colors text-ukire-text"
                             >
                                 &lt;
@@ -281,14 +287,14 @@ export default function OrdersPage() {
                                     onClick={() => handlePageChange(page)}
                                     className={`w-10 h-10 flex items-center justify-center border rounded-full ${
                                         currentPage === page ? "border-ukire-black bg-ukire-black text-white" : "border-gray-300 hover:bg-ukire-gray text-ukire-text"
-                                    }`}
+                                    } transition-colors`}
                                 >
                                     {page}
                                 </button>
                             ))}
                             <button
-                                onClick={() => handlePageChange(pagination.current_page + 1)}
-                                disabled={currentPage === pagination.last_page}
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={pagination.current_page === pagination.last_page}
                                 className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:bg-ukire-gray transition-colors text-ukire-text"
                             >
                                 &gt;
@@ -302,7 +308,6 @@ export default function OrdersPage() {
         </div>
       </main>
 
-      {/* Footer di sini */}
       <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
           <FooterLinks /> 

@@ -3,8 +3,8 @@ import { ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { callApi, API_BASE_URL } from "../utils/api";
 import Loading from "../loading";
-import Navbar from '../components/Navbar'; // Impor Navbar
-import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
+import Navbar from '../components/Navbar';
+import FooterLinks from '../landingpage/FooterLinks';
 
 function isLoggedIn() {
   return !!localStorage.getItem("accessToken");
@@ -13,7 +13,7 @@ function isLoggedIn() {
 export default function PemesananPage() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
-  const [cartTotal, setCartTotal] = useState(0); // Total keranjang dari API
+  const [cartTotal, setCartTotal] = useState(0); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -26,12 +26,11 @@ export default function PemesananPage() {
   const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [shippingMethod, setShippingMethod] = useState("Reguler"); // Default reguler
+  const [shippingMethod, setShippingMethod] = useState("Reguler"); 
   const [notes, setNotes] = useState("");
   const [formSubmitLoading, setFormSubmitLoading] = useState(false);
   const [formSubmitError, setFormSubmitError] = useState(null);
 
-  // Fungsi untuk mengambil item keranjang dari API
   const fetchCartItems = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -40,7 +39,7 @@ export default function PemesananPage() {
     if (!token) {
       setError("Anda perlu login untuk melanjutkan pemesanan.");
       setLoading(false);
-      navigate("/login");
+      navigate("/login"); 
       return;
     }
 
@@ -60,11 +59,17 @@ export default function PemesananPage() {
       }
       setLoading(false);
 
-      if (response.message && (response.message.includes("Unauthenticated") || response.message.includes("Token"))) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
-        alert("Sesi Anda berakhir. Silakan login kembali.");
-        window.location.href = '/login';
+      const userData = localStorage.getItem('user');
+      if (userData) {
+          try {
+            const user = JSON.parse(userData);
+            const [fName, ...lName] = user.name.split(' ');
+            setFirstName(fName || '');
+            setLastName(lName.join(' ') || '');
+            setEmail(user.email || '');
+          } catch (e) {
+            console.error("Error parsing user data from localStorage:", e);
+          }
       }
 
     } catch (err) {
@@ -86,7 +91,6 @@ export default function PemesananPage() {
     fetchCartItems();
   }, [fetchCartItems]);
 
-  // Handle submit form pemesanan
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
     setFormSubmitLoading(true);
@@ -99,7 +103,6 @@ export default function PemesananPage() {
       return;
     }
 
-    // Mengambil data dari form
     const orderData = {
         shipping_address: address,
         shipping_city: city,
@@ -107,37 +110,30 @@ export default function PemesananPage() {
         shipping_postal_code: postalCode,
         phone_number: phone,
         notes: notes,
-        shipping_method: shippingMethod, // Jika ingin disimpan di DB
     };
 
     try {
       const response = await callApi("orders", "POST", orderData, token);
       alert(response.message || "Pesanan Anda berhasil dibuat!");
-      // Redirect ke halaman pembayaran, sertakan orderId dan totalnya via state
       navigate("/pembayaran", { state: { orderId: response.data.id, orderTotal: response.data.total_amount } }); 
     } catch (err) {
       console.error("Error submitting order:", err);
-      if (err.message) {
+      if (err.message && typeof err.message === 'string' && err.message.includes("message") && err.message.includes("errors")) {
           try {
-            const errorResponse = JSON.parse(err.message);
-            if (errorResponse.errors) {
-                const validationErrors = Object.values(errorResponse.errors).flat().join('\n');
-                setFormSubmitError("Validasi Gagal:\n" + validationErrors);
-            } else {
-                setFormSubmitError(errorResponse.message || "Terjadi kesalahan saat membuat pesanan.");
-            }
+            const errorObj = JSON.parse(err.message);
+            const validationErrors = Object.values(errorObj.errors).flat().join('\n');
+            setFormSubmitError("Validasi Gagal:\n" + validationErrors);
           } catch (parseError) {
             setFormSubmitError(err.message || "Terjadi kesalahan saat membuat pesanan.");
           }
       } else {
-          setFormSubmitError("Terjadi kesalahan saat membuat pesanan.");
+          setFormSubmitError(err.message || "Terjadi kesalahan saat membuat pesanan.");
       }
     } finally {
       setFormSubmitLoading(false);
     }
   };
 
-  // Fungsi untuk format harga
   const formatPrice = (price) => {
     if (typeof price !== 'number') {
         price = parseFloat(price);
@@ -153,7 +149,6 @@ export default function PemesananPage() {
     }).format(price);
   };
 
-  // Hitung biaya pengiriman dan total
   const shippingCost = shippingMethod === "Reguler" ? 250000 : (shippingMethod === "Express" ? 500000 : 0);
   const totalWithShipping = cartTotal + shippingCost;
 
@@ -166,7 +161,6 @@ export default function PemesananPage() {
     return <div className="text-center py-12 text-red-500 text-lg">{error}</div>;
   }
 
-  // Jika keranjang kosong setelah loading selesai dan tidak ada error lain
   if (cartItems.length === 0 && !loading && !error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-ukire-gray">
@@ -183,7 +177,6 @@ export default function PemesananPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar di sini */}
       <Navbar />
 
       <main className="flex-1 bg-ukire-gray py-12">
@@ -401,7 +394,7 @@ export default function PemesananPage() {
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h2 className="text-xl font-medium mb-6 text-ukire-black">Catatan Pesanan</h2>
                 <textarea
-                  className="w-full border border-gray-300 px-4 py-2 h-32 focus:outline-none rounded-lg focus:ring-1 focus:ring-ukire-amber text-ukire-text"
+                  className="w-full border border-gray-300 px-4 py-2 h-32 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
                   placeholder="Tambahkan catatan khusus untuk pesanan Anda (opsional)"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -410,12 +403,11 @@ export default function PemesananPage() {
               </div>
             </div>
 
-            {/* Order Summary */}
             <div className="lg:w-1/3">
               <div className="bg-white p-6 rounded-lg shadow-sm sticky top-6">
                 <h2 className="text-xl font-medium mb-6 text-ukire-black">Ringkasan Pesanan</h2>
 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-4 mb-6 text-ukire-text">
                   {cartItems.map((item) => (
                     <div key={item.id} className="flex gap-4">
                       <div className="w-20 h-20 bg-ukire-gray flex-shrink-0 rounded-lg overflow-hidden">
@@ -462,7 +454,7 @@ export default function PemesananPage() {
 
                 <p className="text-xs text-ukire-text mt-4 text-center">
                   Dengan mengklik tombol di atas, Anda menyetujui{" "}
-                  <Link to="/terms" className="underline text-ukire-black hover:text-ukire-amber">
+                  <Link to="/terms" className="underline hover:text-ukire-amber">
                     Syarat dan Ketentuan
                   </Link>{" "}
                   kami
@@ -473,7 +465,6 @@ export default function PemesananPage() {
         </div>
       </main>
 
-      {/* Footer di sini */}
       <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
           <FooterLinks /> 

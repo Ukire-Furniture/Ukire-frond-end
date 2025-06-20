@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { callApi } from "../../utils/api";
 import Loading from "../../loading";
 import { API_BASE_URL } from '../../utils/api'; 
-import Navbar from '../../components/Navbar'; // Impor Navbar
-import FooterLinks from '../../landingpage/FooterLinks'; // Impor FooterLinks
+import Navbar from '../../components/Navbar'; 
+import FooterLinks from '../../landingpage/FooterLinks'; 
 
 export default function ProdukDetailPage() {
   const { id } = useParams();
@@ -139,7 +139,7 @@ export default function ProdukDetailPage() {
       {/* Footer di sini */}
       <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
-          <FooterLinks /> {/* Komponen FooterLinks yang sudah ada */}
+          <FooterLinks /> 
           <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
             <Link to="/about">ABOUT US</Link>
             <Link to="/blog">BLOG</Link>

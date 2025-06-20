@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { callApi } from "../utils/api";
-import Navbar from '../components/Navbar'; // Impor Navbar
-import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
+import Navbar from '../components/Navbar';
+import FooterLinks from '../landingpage/FooterLinks';
 
 function isLoggedIn() {
   return !!localStorage.getItem("accessToken");
@@ -48,21 +48,16 @@ export default function RegisterPage() {
       }, 2000); 
     } catch (err) {
       console.error("Register Error:", err);
-      // Coba parse error dari backend untuk pesan validasi lebih detail
-      if (err.message) {
+      if (err.message && typeof err.message === 'string' && err.message.includes("message") && err.message.includes("errors")) {
           try {
-              const errorResponse = JSON.parse(err.message);
-              if (errorResponse.errors) {
-                  const validationErrors = Object.values(errorResponse.errors).flat().join('\n');
-                  setError("Validasi Gagal:\n" + validationErrors);
-              } else {
-                  setError(errorResponse.message || "Terjadi kesalahan saat registrasi.");
-              }
+            const errorObj = JSON.parse(err.message);
+            const validationErrors = Object.values(errorObj.errors).flat().join('\n');
+            setError("Validasi Gagal:\n" + validationErrors);
           } catch (parseError) {
-              setError(err.message || "Terjadi kesalahan saat registrasi.");
+            setError(err.message || "Terjadi kesalahan saat registrasi.");
           }
       } else {
-          setError("Terjadi kesalahan saat registrasi.");
+          setError(err.message || "Terjadi kesalahan saat registrasi.");
       }
     } finally {
       setLoading(false);
@@ -71,7 +66,6 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar di sini */}
       <Navbar />
 
       <main className="flex-1 py-12 bg-ukire-gray">
@@ -202,10 +196,9 @@ export default function RegisterPage() {
         </div>
       </main>
 
-      {/* Footer di sini */}
       <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
-          <FooterLinks /> 
+          <FooterLinks />
           <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
             <Link to="/about">ABOUT US</Link>
             <Link to="/blog">BLOG</Link>

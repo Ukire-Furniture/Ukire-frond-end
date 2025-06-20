@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { callApi, API_BASE_URL } from "../utils/api"; 
+import { callApi, API_BASE_URL } from "../utils/api";
 import Loading from "../loading";
-import { isLoggedIn } from "../main"; 
-import Navbar from '../components/Navbar'; // Impor Navbar
-import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
+import { isLoggedIn } from "../main";
+import Navbar from '../components/Navbar';
+import FooterLinks from '../landingpage/FooterLinks';
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -97,16 +97,16 @@ export default function HomePage() {
                 </Link>
                 {!showShopButton && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl text-gray-700 font-semibold animate-pulse">Belanja Sekarang</span>
+                    <span className="text-xl text-gray-700 font-semibold animate-pulse">Lihat Koleksi</span>
                   </div>
                 )}
               </div>
             </div>
             <div className="flex-1 flex justify-center">
               <img
-                src="/images/awal.jpeg" 
+                src="/images/kayu/pintugebyok2.webp" // PASTIKAN FILE INI ADA DI public/images/
                 alt="Furniture Hero"
-                className="rounded-xl shadow-lg w-full max-w-md object-cover"
+                className="rounded-xl shadow-lg w-full max-w-md object-cover transform transition-transform duration-500 hover:scale-105"
               />
             </div>
           </div>
@@ -171,15 +171,13 @@ export default function HomePage() {
 
       {/* Footer di sini */}
       <footer className="mt-auto pt-16 pb-8 border-t">
-        <div className="container mx-auto px-4">
-          <FooterLinks /> 
-          <div className="pt-8 border-t text-xs text-gray-500 flex flex-wrap gap-6">
-            <Link to="/about">ABOUT US</Link>
-            <Link to="/blog">BLOG</Link>
-            <Link to="/faq">FAQ</Link>
-            <Link to="/order-tracking">ORDER TRACKING</Link>
-            <Link to="/contact">CONTACT</Link>
-          </div>
+        <FooterLinks />
+        <div className="pt-8 border-t text-xs text-gray-500 flex flex-wrap gap-6">
+          <Link to="/about">ABOUT US</Link>
+          <Link to="/blog">BLOG</Link>
+          <Link to="/faq">FAQ</Link>
+          <Link to="/order-tracking">ORDER TRACKING</Link>
+          <Link to="/contact">CONTACT</Link>
         </div>
       </footer>
     </div>

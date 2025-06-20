@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { isLoggedIn } from '../main.jsx'; 
-import { callApi } from '../utils/api.js'; 
-import { ShoppingBag } from 'lucide-react'; 
+import { isLoggedIn } from '../main.jsx';
+import { callApi } from '../utils/api.js';
+import { ShoppingBag } from 'lucide-react';
 
 const Navbar = () => {
     const [loggedIn, setLoggedIn] = useState(isLoggedIn());
@@ -102,8 +102,9 @@ const Navbar = () => {
             </div>
             <div className="flex-1 flex justify-center">
                 <Link to="/" className="flex items-center">
-                    <div className="w-3 h-3 bg-black rotate-45 mr-1 rounded-sm"></div>
-                    <span className="text-2xl font-bold">UKIRE</span>
+                    {/* Menggunakan gambar logo UKIRE.png */}
+                    <img src="/images/ukire.png" alt="UKIRE Logo" className="w-8 h-8 mr-1 object-contain" /> {/* Path ke gambar logo UKIRE.png */}
+                    <span className="text-2xl font-bold text-black">UKIRE</span>
                 </Link>
             </div>
             <div className="flex items-center space-x-4 text-sm">

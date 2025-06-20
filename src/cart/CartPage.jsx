@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
 import { Minus, Plus, X } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
-import { callApi, API_BASE_URL } from "../utils/api"; 
+import { callApi, API_BASE_URL } from "../utils/api";
 import Loading from "../loading";
-import { isLoggedIn } from "../main";
-import Navbar from '../components/Navbar'; // Impor Navbar
-import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
+import Navbar from '../components/Navbar';
+import FooterLinks from '../landingpage/FooterLinks';
+
+function isLoggedIn() {
+  return !!localStorage.getItem("accessToken");
+}
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([]);
@@ -14,11 +17,9 @@ export default function CartPage() {
   const [cartTotal, setCartTotal] = useState(0);
 
   const fetchCartItems = useCallback(async () => {
-    console.log("Memulai fetchCartItems di CartPage...");
     setLoading(true);
     setError(null);
     const token = localStorage.getItem("accessToken");
-    console.log("Token yang ditemukan:", token ? "Ada" : "Tidak ada");
 
     if (!token) {
       setCartItems([]);
@@ -30,8 +31,6 @@ export default function CartPage() {
 
     try {
       const response = await callApi("cart", "GET", null, token);
-      console.log("Respons API Keranjang:", response);
-
       if (response.data && response.data.length === 0) {
         setError("Keranjang belanja Anda kosong. Silakan belanja terlebih dahulu.");
         setCartItems([]);
@@ -39,8 +38,6 @@ export default function CartPage() {
       } else if (response.data) {
         setCartItems(response.data);
         setCartTotal(response.cart_total);
-        console.log("State cartItems setelah di-set:", response.data);
-        console.log("State cartTotal setelah di-set:", response.cart_total);
       } else {
           setError("Gagal memuat keranjang: Respon data tidak valid.");
           setCartItems([]);
@@ -56,7 +53,7 @@ export default function CartPage() {
       }
 
     } catch (err) {
-      console.error("Error fetching cart items (catch block):", err);
+      console.error("Error fetching cart items:", err);
       setError("Gagal memuat keranjang belanja: " + (err.message || "Terjadi kesalahan."));
       setCartItems([]);
       setCartTotal(0);
@@ -180,16 +177,14 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar di sini */}
       <Navbar />
 
-      <main className="flex-1 py-12 bg-ukire-gray">
+      <main className="flex-1 bg-ukire-gray py-12">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-light mb-8 text-ukire-black">KERANJANG BELANJA</h1>
 
           {cartItems.length > 0 ? (
             <div className="flex flex-col lg:flex-row gap-8">
-              {/* Cart Items */}
               <div className="lg:w-2/3">
                 <div className="border-b pb-4 mb-4 hidden md:grid md:grid-cols-12 text-sm font-medium text-ukire-black">
                   <div className="md:col-span-6">Produk</div>
@@ -312,7 +307,6 @@ export default function CartPage() {
         </div>
       </main>
 
-      {/* Footer di sini */}
       <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
         <div className="container mx-auto px-4">
           <FooterLinks /> 
