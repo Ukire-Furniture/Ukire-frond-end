@@ -1,4 +1,4 @@
-    import React from 'react'
+import React from 'react'
     import ReactDOM from 'react-dom/client'
     import { BrowserRouter, Routes, Route, Link } from 'react-router-dom' 
     import './index.css'
@@ -18,6 +18,7 @@
     import OrdersPage from './profile/orders/OrdersPage.jsx';
     import ProfilePage from './profile/profilePage.jsx';
     import WishlistPage from './profile/wishlist/WishlistPage.jsx';
+    import LandingPage from './landingpage/LandingPage.jsx';
 
     // Fungsi global untuk mengecek status login
     export function isLoggedIn() { 
@@ -61,7 +62,7 @@
         <BrowserRouter>
           <Routes>
             {/* Rute Publik */}
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={isLoggedIn() ? <HomePage /> : <LandingPage />} />
             <Route path="/produk" element={<ProdukPage />} />
             <Route path="/produk/:id" element={<ProdukDetailPage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -93,4 +94,3 @@
         </BrowserRouter>
       </React.StrictMode>
     )
-    
