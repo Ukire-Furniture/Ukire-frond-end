@@ -3,8 +3,8 @@ import { ChevronRight, CreditCard, Landmark, Wallet } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { callApi, API_BASE_URL } from "../utils/api";
 import Loading from "../loading";
-import Navbar from '../components/Navbar'; // Impor Navbar
-import FooterLinks from '../landingpage/FooterLinks'; // Impor FooterLinks
+import Navbar from '../components/Navbar';
+import FooterLinks from '../landingpage/FooterLinks';
 
 function isLoggedIn() {
   return !!localStorage.getItem("accessToken");
@@ -15,12 +15,13 @@ export default function PembayaranPage() {
   const navigate = useNavigate();
   
   const [orderId, setOrderId] = useState(null);
-  const [orderTotal, setOrderTotal] = useState(0); // Total final dari pesanan
-  const [cartItems, setCartItems] = useState([]); // Item yang dipesan (dari detail order)
+  const [orderTotal, setOrderTotal] = useState(0); 
+  const [cartItems, setCartItems] = useState([]); 
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("credit_card"); // Default metode pembayaran
+  const [paymentMethod, setPaymentMethod] = useState("credit_card"); 
+  const [confirmingPayment, setConfirmingPayment] = useState(false); // State untuk loading konfirmasi pembayaran
 
   const fetchOrderDetails = useCallback(async (id) => {
     setLoading(true);
@@ -35,14 +36,14 @@ export default function PembayaranPage() {
 
     try {
       const response = await callApi(`orders/${id}`, "GET", null, token);
-      if (response && response.data) {
+      if (response.data) { // Periksa response.data, bukan hanya response
         setOrderId(response.data.id);
-        setOrderTotal(response.data.total_amount);
+        setOrderTotal(response.data.total_amount); 
         
         const formattedItems = response.data.items.map(item => ({
             id: item.id,
             name: item.product.name,
-            price: item.price_at_order,
+            price: item.price_at_order, 
             quantity: item.quantity,
             image_path: item.product.image_path,
             total_item_price: item.quantity * item.price_at_order,
@@ -72,12 +73,32 @@ export default function PembayaranPage() {
     } else {
       setError("Tidak ada pesanan yang ditemukan untuk diproses pembayaran. Silakan mulai dari halaman pemesanan.");
       setLoading(false);
+      // Opsional: Redirect ke /pemesanan jika tidak ada orderId
+      // navigate("/pemesanan");
     }
   }, [location.state, fetchOrderDetails]);
 
   const handleConfirmPayment = async () => {
-      alert("Pembayaran dikonfirmasi! (Fungsionalitas pembayaran sesungguhnya akan diimplementasikan di tahap selanjutnya)");
-      navigate("/profile/orders"); 
+      setConfirmingPayment(true);
+      const token = localStorage.getItem("accessToken");
+
+      if (!token || !orderId) {
+          alert("Gagal mengkonfirmasi pembayaran: Tidak ada pesanan atau Anda belum login.");
+          setConfirmingPayment(false);
+          return;
+      }
+
+      try {
+          // Panggil API untuk mengubah status pesanan menjadi 'completed'
+          const response = await callApi(`orders/${orderId}/status`, "PUT", { status: 'completed' }, token);
+          alert(response.message || "Pembayaran berhasil dikonfirmasi! Pesanan Anda telah selesai.");
+          navigate("/profile/orders"); // Redirect ke halaman riwayat pesanan
+      } catch (err) {
+          console.error("Error confirming payment:", err);
+          alert("Gagal mengkonfirmasi pembayaran: " + (err.message || "Terjadi kesalahan."));
+      } finally {
+          setConfirmingPayment(false);
+      }
   };
 
   const formatPrice = (price) => {
@@ -95,8 +116,8 @@ export default function PembayaranPage() {
     }).format(price);
   };
 
-  const estimatedShipping = 250000;
-  const subtotalBeforeShipping = orderTotal - estimatedShipping;
+  const estimatedShipping = 250000; 
+  const subtotalBeforeShipping = orderTotal - estimatedShipping; 
 
   if (loading) {
     return <Loading />;
@@ -266,7 +287,8 @@ export default function PembayaranPage() {
                     <input
                       type="text"
                       id="billingAddress"
-                      className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber text-ukire-text"
+                      className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
+                      placeholder="Jika berbeda dari alamat pengiriman"
                       required
                     />
                   </div>
@@ -278,7 +300,8 @@ export default function PembayaranPage() {
                       <input
                         type="text"
                         id="billingCity"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber text-ukire-text"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
+                        placeholder="Jika berbeda dari alamat pengiriman"
                         required
                       />
                     </div>
@@ -288,7 +311,7 @@ export default function PembayaranPage() {
                       </label>
                       <select
                         id="billingProvince"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber text-ukire-text"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
                         required
                       >
                         <option value="">Pilih Provinsi</option>
@@ -308,7 +331,8 @@ export default function PembayaranPage() {
                       <input
                         type="text"
                         id="billingPostalCode"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber text-ukire-text"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-ukire-amber"
+                        placeholder="Jika berbeda dari alamat pengiriman"
                         required
                       />
                     </div>
@@ -322,7 +346,7 @@ export default function PembayaranPage() {
               <div className="bg-white p-6 rounded-lg shadow-sm sticky top-6">
                 <h2 className="text-xl font-medium mb-6 text-ukire-black">Ringkasan Pesanan</h2>
 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-4 mb-6 text-ukire-text">
                   {cartItems.map((item) => (
                     <div key={item.id} className="flex gap-4">
                       <div className="w-20 h-20 bg-ukire-gray flex-shrink-0 rounded-lg overflow-hidden">
@@ -346,30 +370,29 @@ export default function PembayaranPage() {
                 <div className="border-t border-b border-gray-200 py-4 space-y-2 mb-4">
                   <div className="flex justify-between text-sm text-ukire-text">
                     <span>Subtotal</span>
-                    <span>{formatPrice(cartTotal)}</span>
+                    <span>{formatPrice(subtotalBeforeShipping)}</span>
                   </div>
                   <div className="flex justify-between text-sm text-ukire-text">
                     <span>Pengiriman</span>
-                    <span>{formatPrice(shippingCost)}</span>
+                    <span>{formatPrice(estimatedShipping)}</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between font-medium text-ukire-black mb-6">
                   <span>Total</span>
-                  <span>{formatPrice(totalWithShipping)}</span>
+                  <span>{formatPrice(orderTotal)}</span>
                 </div>
 
                 <button
-                  type="submit"
-                  className="block w-full bg-gray-800 text-white text-center py-3 rounded-lg transition-colors hover:bg-amber-50 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={formSubmitLoading || cartItems.length === 0}
+                  onClick={handleConfirmPayment}
+                  className="mt-3 w-full bg-gray-800 text-white py-2 text-sm rounded-b-lg transition-colors duration-300 hover:bg-amber-50 hover:text-black"
                 >
-                  {formSubmitLoading ? "Membuat Pesanan..." : "Konfirmasi Pemesanan"}
+                  Konfirmasi Pembayaran
                 </button>
 
                 <p className="text-xs text-ukire-text mt-4 text-center">
                   Dengan mengklik tombol di atas, Anda menyetujui{" "}
-                  <Link to="/terms" className="underline text-ukire-black hover:text-ukire-amber">
+                  <Link to="/terms" className="underline hover:text-ukire-amber">
                     Syarat dan Ketentuan
                   </Link>{" "}
                   kami
@@ -382,15 +405,13 @@ export default function PembayaranPage() {
 
       {/* Footer di sini */}
       <footer className="mt-auto pt-16 pb-8 border-t border-gray-200 bg-white">
-        <div className="container mx-auto px-4">
-          <FooterLinks /> 
-          <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
-            <Link to="/about">ABOUT US</Link>
-            <Link to="/blog">BLOG</Link>
-            <Link to="/faq">FAQ</Link>
-            <Link to="/order-tracking">ORDER TRACKING</Link>
-            <Link to="/contact">CONTACT</Link>
-          </div>
+        <FooterLinks />
+        <div className="pt-8 border-t border-gray-200 text-xs text-ukire-text flex flex-wrap gap-6">
+          <Link to="/about">ABOUT US</Link>
+          <Link to="/blog">BLOG</Link>
+          <Link to="/faq">FAQ</Link>
+          <Link to="/order-tracking">ORDER TRACKING</Link>
+          <Link to="/contact">CONTACT</Link>
         </div>
       </footer>
     </div>
