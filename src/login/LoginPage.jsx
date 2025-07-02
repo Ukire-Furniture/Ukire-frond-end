@@ -106,7 +106,7 @@ export default function LoginPage() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-ukire-black text-white py-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-amber-50 hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? "Memuat..." : "Login"}

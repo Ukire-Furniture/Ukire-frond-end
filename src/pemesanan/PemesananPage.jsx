@@ -446,7 +446,7 @@ export default function PemesananPage() {
 
                 <button
                   type="submit"
-                  className="block w-full bg-ukire-black text-white text-center py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="block w-full bg-gray-800 text-white text-center py-3 rounded-lg transition-colors hover:bg-amber-50 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={formSubmitLoading || cartItems.length === 0}
                 >
                   {formSubmitLoading ? "Membuat Pesanan..." : "Konfirmasi Pemesanan"}

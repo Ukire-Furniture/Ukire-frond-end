@@ -273,7 +273,7 @@ export default function CartPage() {
 
                   <Link
                     to="/pemesanan"
-                    className="block w-full bg-ukire-black text-white text-center py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="block w-full bg-black text-white text-center py-3 rounded-lg hover:bg-amber-50 hover:text-black transition-colors"
                   >
                     Lanjut ke Pemesanan
                   </Link>
@@ -286,7 +286,7 @@ export default function CartPage() {
                         placeholder="Masukkan kode promo"
                         className="flex-1 border border-gray-300 px-4 py-2 focus:outline-none rounded-l-lg"
                       />
-                      <button className="bg-ukire-black text-white px-4 py-2 text-sm uppercase rounded-r-lg">TERAPKAN</button>
+                      <button className="bg-black text-white px-4 py-2 text-sm uppercase rounded-r-lg hover:bg-amber-50 hover:text-black transition-colors">TERAPKAN</button>
                     </div>
                   </div>
                 </div>

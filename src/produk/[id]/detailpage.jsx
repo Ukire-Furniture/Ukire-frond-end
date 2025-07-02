@@ -121,7 +121,7 @@ export default function ProdukDetailPage() {
               <p className="text-sm text-ukire-text mb-6">Kategori: {product.category ? product.category.name : 'Tidak Diketahui'}</p>
               <button 
                 onClick={handleAddToCart}
-                className="w-full bg-ukire-black text-white py-3 rounded-lg shadow-md hover:bg-gray-800 transition-colors"
+                className="w-full bg-gray-800 text-white py-3 rounded-lg shadow-md transition-colors hover:bg-amber-50 hover:text-black"
               >
                 Tambah ke Keranjang
               </button>

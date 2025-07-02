@@ -286,7 +286,10 @@ export default function ProdukPage() {
                       <p className="text-sm font-semibold text-ukire-amber mt-1">{formatPrice(product.price)}</p>
                     </Link>
                     {/* Tombol Tambah ke Keranjang - Muncul saat hover */}
-                    <button onClick={() => handleAddToCart(product.id)} className="mt-3 w-full bg-ukire-black text-white py-2 text-sm rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-800">
+                    <button
+                      onClick={() => handleAddToCart(product.id)}
+                      className="mt-3 w-full bg-gray-800 text-white py-2 text-sm rounded-b-lg transition-colors duration-300 hover:bg-amber-50 hover:text-black"
+                    >
                       Tambah ke Keranjang
                     </button>
                   </div>
